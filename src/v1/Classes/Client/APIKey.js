@@ -1,5 +1,4 @@
-const toJSON = require("../../toJSON");
-const Client = require('../Client');
+const Client = require('../../Client');
 
 /**
  * @typedef {Object} APIKey
@@ -9,8 +8,12 @@ class APIKey {
      * Create a new API Key class
      * @param {Client} client The PteroManager Client
      * @param {Object} data The APIKey Data
+     * @param {Object} metadata The APIKey Metadata
      */
     constructor(client, data, metadata) {
+        if (!client) throw new Error('Client is required');
+        if (!data) throw new Error('Data is required');
+
         this.client = client;
         this.identifier = data.identifier;
         this.description = data.description;
@@ -23,7 +26,7 @@ class APIKey {
         }
     }
     delete() {
-        this.client
+        return this.client.deleteAPIKey({ identifier: this.identifier });
     }
     toJSON() {
         return { identifier: this.identifier, description: this.description, createdAt: this.createdAt, lastUsedAt: this.lastUsedAt, allowedIPs: this.allowedIPs };

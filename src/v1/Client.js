@@ -1,6 +1,6 @@
 const requests = require('../requests');
 const constants = require('./Constants')
-const APIKey = require('./Classes/APIKey');
+const APIKey = require('./Classes/Client/APIKey');
 const Collection = require('../Collection');
 
 class Client {
@@ -84,7 +84,7 @@ class Client {
     /**
      * Disable The Two Factor Authentication For The Current Client
      * @param {constants.disableTwoFactorAuth} data The data
-     * @returns {Promise<Object>} The Two Factor Authentication Details
+     * @returns {Promise<Boolean>} The Two Factor Authentication Details
      */
     disableTwoFactorAuth(data) {
         if (!data) throw new Error('Data is required');
@@ -93,7 +93,7 @@ class Client {
         if (typeof data.password !== 'string') throw new TypeError('Password must be a string');
         return new Promise((resolve, reject) => {
             requests(`${this.host}/account/two-factor`, this.APIKey, 'DELETE', { password: data.password }).then(res => {
-                resolve({ success: true })
+                resolve(true)
             }).catch(err => {
                 reject(throwError(err))
             })
@@ -114,7 +114,7 @@ class Client {
         if (typeof data.password !== 'string') throw new TypeError('Password must be a string');
         return new Promise((resolve, reject) => {
             requests(`${this.host}/account/email`, this.APIKey, 'PUT', { email: data.email, password: data.password }).then(res => {
-                resolve({ success: true })
+                resolve(true)
             }).catch(err => {
                 reject(throwError(err))
             })
@@ -135,7 +135,7 @@ class Client {
         if (typeof data.newPassword !== 'string') throw new TypeError('New Password must be a string');
         return new Promise((resolve, reject) => {
             requests(`${this.host}/account/password`, this.APIKey, 'PUT', { current_password: data.oldPassword, password: data.newPassword, password_confirmation: data.newPassword }).then(res => {
-                resolve({ success: true })
+                resolve(true)
             }).catch(err => {
                 reject(throwError(err))
             })
@@ -177,6 +177,25 @@ class Client {
         return new Promise((resolve, reject) => {
             requests(`${this.host}/account/api-keys`, this.APIKey, 'POST', { name: data.name, description: data.description, allowed_ips: data.allowed_ips ? data.allowed_ips : [] }).then(res => {
                 resolve(new APIKey(this, res.attributes, res.meta))
+            }).catch(err => {
+                reject(throwError(err))
+            })
+        })
+    }
+
+    /**
+     * Delete An API Key For The Current Client
+     * @param {constants.deleteAPIKey} data The data
+     * @returns {Promise<Boolean>} Wether the API Key was successfully deleted
+     */
+    deleteAPIKey(data) {
+        if (!data) throw new Error('Data is required');
+        if (typeof data !== 'object') throw new TypeError('Data must be an object');
+        if (!data.identifier) throw new Error('Identifier is required');
+        if (typeof data.identifier !== 'string') throw new TypeError('Identifier must be a string');
+        return new Promise((resolve, reject) => {
+            requests(`${this.host}/account/api-keys/${data.identifier}`, this.APIKey, 'DELETE', {}).then(res => {
+                resolve(true)
             }).catch(err => {
                 reject(throwError(err))
             })

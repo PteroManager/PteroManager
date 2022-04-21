@@ -50,3 +50,12 @@ exports.createAPIKey = {
     description: String,
     allowed_ips: Array
 }
+
+/**
+ * @typedef deleteAPIKey
+ * 
+ * @property {string} identifier The API Key Identifier
+ */
+exports.deleteAPIKey = {
+    identifier: String
+}
