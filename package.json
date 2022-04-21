@@ -1,0 +1,26 @@
+{
+  "name": "pteromanager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon tests/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PteroManager/PteroManager.git"
+  },
+  "keywords": [],
+  "contributors": [
+    "Jeweetzelf (jeweetzelf@pteromanager.ga)",
+    "Dotto (dotto@pteromanager.ga)"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PteroManager/PteroManager/issues"
+  },
+  "homepage": "https://docs.pteromanager.ga/",
+  "dependencies": {
+    "axios": "^0.26.1"
+  }
+}
