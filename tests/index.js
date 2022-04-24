@@ -1,14 +1,13 @@
 const PteroManager = require('../');
 const config = require('./config.json')
-const Collection = require('../src/Collection');
-const APIKey = require('../src/v1/Classes/Client/APIKey');
 
-const client = new PteroManager.Client('https://panel.ck-hosting.com', config.APIKey);
-new APIKey('test', 'uecd', 'edc')
-client.deleteAPIKey({
-    identifier: 'nBMHaduclXYb4qvE'
-}).then(res => {
-    console.log(res)
+const client = new PteroManager.Client(config.panelURL, config.APIKey, { addServersToCache: true, addAPIKeysToCache: true });
+// dd56f84a
+client.servers.fetch({
+    identifier: 'dd56f84a'
+}).then(async server => {
+    let result = await server.allocations.firstValue().delete()
+    console.log(result)
 }).catch(err => {
-    console.log(err)
+    console.log(err);
 })

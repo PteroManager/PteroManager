@@ -21,6 +21,10 @@
   },
   "homepage": "https://docs.pteromanager.ga/",
   "dependencies": {
+    "@pteromanager/collection": "^1.0.6",
     "axios": "^0.26.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.3"
   }
 }

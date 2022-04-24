@@ -1,15 +1,20 @@
 const requests = require('../requests');
-const constants = require('./Constants')
-const APIKey = require('./Classes/Client/APIKey');
-const Collection = require('../Collection');
+const APIKey = require('./Classes/Client/Account/APIKey');
+const { default: Collection } = require('@pteromanager/collection');
+const ClientServerManager = require('./Classes/Client/Managers/ClientServerManager')
+const ClientAPIKeyManager = require('./Classes/Client/Managers/ClientAPIKeyManager')
 
 class Client {
     /**
      * Create A New Client
      * @param {string} host The url of the Pterodactyl Panel
      * @param {string} APIKey The APIKey of the Client
+     * @param {object} options The options
+     * @param {boolean} [options.addServersToCache] Whether to cache the fetched data of the servers
+     * @param {boolean} [options.addAPIKeysToCache] Whether to cache the fetched data of the APIKeys
+     * @param {boolean} [options.addAllocationsToCache] Whether to cache the fetched data of the Allocations
      */
-    constructor(host, APIKey) {
+    constructor(host, APIKey, options) {
         if (!host) {
             throw new Error('Host is required');
         }
@@ -32,6 +37,23 @@ class Client {
 
         this.host = host;
         this.APIKey = APIKey;
+
+        this.options = options || {}
+
+        this.APIKeys = new ClientAPIKeyManager(this)
+        this.servers = new ClientServerManager(this);
+    }
+
+    /**
+     * Throw a new error
+     * @param {string|object|Error|TypeError} error The error
+     * @returns {string|object|Error|TypeError} The error
+     * @private
+     */
+    throwError(error) {
+        if (error.response && error.response.data) return error.response.data;
+        else if (error.response && error.response.status) return error.response.status;
+        else return error;
     }
 
     /**
@@ -43,7 +65,7 @@ class Client {
             requests(`${this.host}/account`, this.APIKey, 'GET', {}).then(res => {
                 resolve(res.attributes)
             }).catch(err => {
-                reject(throwError(err))
+                reject(this.throwError(err))
             })
         })
     }
@@ -57,14 +79,15 @@ class Client {
             requests(`${this.host}/account/two-factor`, this.APIKey, 'GET', {}).then(res => {
                 resolve(res.data)
             }).catch(err => {
-                reject(throwError(err))
+                reject(this.throwError(err))
             })
         })
     }
 
     /**
      * Enable The Two Factor Authentication For The Current Client
-     * @param {constants.enableTwoFactorAuth} data The data
+     * @param {object} data The data
+     * @param {string} data.code The code to enable the two factor authentication
      * @returns {Promise<Object>} The Two Factor Authentication Details
      */
     enableTwoFactorAuth(data) {
@@ -76,14 +99,15 @@ class Client {
             requests(`${this.host}/account/two-factor`, this.APIKey, 'POST', { code: data.code }).then(res => {
                 resolve(res.attributes)
             }).catch(err => {
-                reject(throwError(err))
+                reject(this.throwError(err))
             })
         })
     }
 
     /**
      * Disable The Two Factor Authentication For The Current Client
-     * @param {constants.disableTwoFactorAuth} data The data
+     * @param {object} data The data
+     * @param {string} data.password The password of the client
      * @returns {Promise<Boolean>} The Two Factor Authentication Details
      */
     disableTwoFactorAuth(data) {
@@ -95,14 +119,16 @@ class Client {
             requests(`${this.host}/account/two-factor`, this.APIKey, 'DELETE', { password: data.password }).then(res => {
                 resolve(true)
             }).catch(err => {
-                reject(throwError(err))
+                reject(this.throwError(err))
             })
         })
     }
 
     /**
      * Update The Current Client's Email
-     * @param {constants.updateAccountEmail} data The data
+     * @param {objecr} data The data
+     * @param {string} data.email The new email of the client
+     * @param {string} data.password The password of the client
      * @returns {Promise<Boolean>} Wether the email was successfully updated
      */
     updateAccountEmail(data) {
@@ -116,14 +142,16 @@ class Client {
             requests(`${this.host}/account/email`, this.APIKey, 'PUT', { email: data.email, password: data.password }).then(res => {
                 resolve(true)
             }).catch(err => {
-                reject(throwError(err))
+                reject(this.throwError(err))
             })
         })
     }
 
     /**
      * Update The Current Client's Password
-     * @param {constants.updateAccountPassword} data The data
+     * @param {object} data The data
+     * @param {string} data.currentPassword The current password of the client
+     * @param {string} data.newPassword The new password of the client
      * @returns {Promise<Boolean>} Wether the password was successfully updated
      */
     updateAccountPassword(data) {
@@ -137,76 +165,10 @@ class Client {
             requests(`${this.host}/account/password`, this.APIKey, 'PUT', { current_password: data.oldPassword, password: data.newPassword, password_confirmation: data.newPassword }).then(res => {
                 resolve(true)
             }).catch(err => {
-                reject(throwError(err))
+                reject(this.throwError(err))
             })
         })
     }
-
-    /**
-     * List The API Keys For The Current Client
-     * @returns {Promise<Collection>} The API Keys
-     */
-    listAPIKeys() {
-        return new Promise((resolve, reject) => {
-            requests(`${this.host}/account/api-keys`, this.APIKey, 'GET', {}).then(res => {
-                let keys = new Collection();
-                res.data.forEach(key => {
-                    keys.set(key.attributes.identifier, new APIKey(this, key.attributes))
-                })
-
-                resolve(keys)
-            }).catch(err => {
-                reject(throwError(err))
-            })
-        })
-    }
-
-    /**
-     * Create A New API Key For The Current Client
-     * @param {constants.createAPIKey} data The data
-     * @returns {Promise<APIKey>} The API Key
-     */
-    createAPIKey(data) {
-        if (!data) throw new Error('Data is required');
-        if (typeof data !== 'object') throw new TypeError('Data must be an object');
-        if (!data.name) throw new Error('Name is required');
-        if (typeof data.name !== 'string') throw new TypeError('Name must be a string');
-        if (!data.description) throw new Error('Description is required');
-        if (typeof data.description !== 'string') throw new TypeError('Description must be a string');
-        if (data.allowed_ips && !Array.isArray(data.allowed_ips)) throw new TypeError('Allowed IPs must be an array');
-        return new Promise((resolve, reject) => {
-            requests(`${this.host}/account/api-keys`, this.APIKey, 'POST', { name: data.name, description: data.description, allowed_ips: data.allowed_ips ? data.allowed_ips : [] }).then(res => {
-                resolve(new APIKey(this, res.attributes, res.meta))
-            }).catch(err => {
-                reject(throwError(err))
-            })
-        })
-    }
-
-    /**
-     * Delete An API Key For The Current Client
-     * @param {constants.deleteAPIKey} data The data
-     * @returns {Promise<Boolean>} Wether the API Key was successfully deleted
-     */
-    deleteAPIKey(data) {
-        if (!data) throw new Error('Data is required');
-        if (typeof data !== 'object') throw new TypeError('Data must be an object');
-        if (!data.identifier) throw new Error('Identifier is required');
-        if (typeof data.identifier !== 'string') throw new TypeError('Identifier must be a string');
-        return new Promise((resolve, reject) => {
-            requests(`${this.host}/account/api-keys/${data.identifier}`, this.APIKey, 'DELETE', {}).then(res => {
-                resolve(true)
-            }).catch(err => {
-                reject(throwError(err))
-            })
-        })
-    }
-}
-
-function throwError(error) {
-    if (error.response.data) return error.response.data;
-    else if (error.response.status) return error.response.status;
-    else return error;
 }
 
 module.exports = Client;

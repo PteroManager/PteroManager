@@ -1,4 +1,4 @@
-const Client = require('../../Client');
+const Client = require('../../../Client');
 
 /**
  * @typedef {Object} APIKey
@@ -25,9 +25,16 @@ class APIKey {
             this.secret_token = metadata.secret_token || null;
         }
     }
+
+    /**
+     * Delete the API Key
+     * @returns {Promise<Boolean>} The API Key
+     */
     delete() {
-        return this.client.deleteAPIKey({ identifier: this.identifier });
+        return this.client.APIKeys.delete({ identifier: this.identifier });
     }
+
+
     toJSON() {
         return { identifier: this.identifier, description: this.description, createdAt: this.createdAt, lastUsedAt: this.lastUsedAt, allowedIPs: this.allowedIPs };
     }
