@@ -15,7 +15,7 @@
     "Jeweetzelf (jeweetzelf@pteromanager.ga)",
     "Dotto (dotto@pteromanager.ga)"
   ],
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/PteroManager/PteroManager/issues"
   },
