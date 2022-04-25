@@ -50,7 +50,7 @@ class ServerAllocation {
 
         return new Promise((resolve, reject) => {
             requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'POST', { notes: data.note}).then(res => {
-                let allocation = new ServerAllocation(this.client, this.server, res.attributes)
+                let allocation = new ServerAllocation(this.client, { identifier: this.server.identifier }, res.attributes)
                 if (this.client.options.addAPIKeysToCache) this.client.servers.cache.set(allocation.id, allocation)
                 resolve(allocation)
             }).catch(err => {

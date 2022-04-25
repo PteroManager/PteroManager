@@ -10,6 +10,7 @@ class Client {
      * @param {string} host The url of the Pterodactyl Panel
      * @param {string} APIKey The APIKey of the Client
      * @param {object} options The options
+     * @param {boolean} [options.addEverythingToCache] For the lazy people
      * @param {boolean} [options.addServersToCache] Whether to cache the fetched data of the servers
      * @param {boolean} [options.addAPIKeysToCache] Whether to cache the fetched data of the APIKeys
      * @param {boolean} [options.addAllocationsToCache] Whether to cache the fetched data of the Allocations
@@ -38,7 +39,13 @@ class Client {
         this.host = host;
         this.APIKey = APIKey;
 
-        this.options = options || {}
+        this.options = options || {};
+
+        if (options && options.addEverythingToCache) {
+            this.options.addServersToCache = true;
+            this.options.addAPIKeysToCache = true;
+            this.options.addAllocationsToCache = true;
+        }
 
         this.APIKeys = new ClientAPIKeyManager(this)
         this.servers = new ClientServerManager(this);

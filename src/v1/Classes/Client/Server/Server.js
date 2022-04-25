@@ -2,6 +2,7 @@ const Client = require('../../../Client');
 const { default: Collection } = require('@pteromanager/collection');
 const ServerAllocation = require('./ServerAllocation');
 const requests = require('../../../../requests');
+const ServerAllocationManager = require('./ServerAllocationManager');
 
 class Server {
     /**
@@ -43,49 +44,7 @@ class Server {
         this.status = data.status;
         this.isTransferring = data.is_transferring;
 
-        this.allocations = new Collection();
-        data.relationships.allocations.data.forEach(allocation => {
-            this.allocations.set(allocation.attributes.id, new ServerAllocation(this.client, this.identifier, allocation.attributes))
-        })
-    }
-
-    /**
-     * Delete a server allocation
-     * @param {object} data The data
-     * @returns {Promise<Boolean>} Whether the allocation was deleted
-     */
-    deleteAllocation(data) {
-        return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.identifier}/network/allocations/${data.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
-                resolve(true)
-            }).catch(err => {
-                reject(this.client.throwError(err))
-            })
-        })
-    }
-
-    /**
-     * Set the note for a server allocation
-     * @param {object} data The data
-     * @returns {Promise<ServerAllocation>} The updated allocation
-     */
-    setAllocationNote(data) {
-        if (!data) throw new Error('Data is required');
-        if (typeof data !== 'object') throw new TypeError('Data must be an object');
-        if (!data.id) throw new Error('ID is required');
-        if (typeof data.id !== 'string') throw new TypeError('ID must be a string');
-        if (!data.note) throw new Error('Note is required');
-        if (typeof data.note !== 'string') throw new TypeError('Note must be a string');
-
-        return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'POST', { notes: data.note }).then(res => {
-                let allocation = new ServerAllocation(this.client, this.identifier, res.attributes)
-                if (this.client.options.addAPIKeysToCache) this.client.servers.cache.set(allocation.id, allocation)
-                resolve(allocation)
-            }).catch(err => {
-                reject(this.client.throwError(err))
-            })
-        })
+        this.allocations = new ServerAllocationManager(this.client, this, data.relationships.allocations.data);
     }
 }
 
