@@ -45,7 +45,7 @@ class Server {
 
         this.allocations = new Collection();
         data.relationships.allocations.data.forEach(allocation => {
-            this.allocations.set(allocation.attributes.id, new ServerAllocation(this.client, this, allocation.attributes))
+            this.allocations.set(allocation.attributes.id, new ServerAllocation(this.client, this.identifier, allocation.attributes))
         })
     }
 
@@ -57,7 +57,7 @@ class Server {
     deleteAllocation(data) {
         return new Promise((resolve, reject) => {
             requests(`${this.client.host}/servers/${this.identifier}/network/allocations/${data.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
-                resolve(res)
+                resolve(true)
             }).catch(err => {
                 reject(this.client.throwError(err))
             })
@@ -77,10 +77,10 @@ class Server {
         if (!data.note) throw new Error('Note is required');
         if (typeof data.note !== 'string') throw new TypeError('Note must be a string');
 
-        return new Promise((resolve, rejext) => {
-            requests(`${this.client.host}/servers/${this.identifier}/network/allocations/${data.id}`, this.client.APIKey, 'PATCH', { note: data.note }).then(res => {
-                let allocation = new ServerAllocation(this.client, this, res.data)
-                if(this.client.options.addAPIKeysToCache) this.client.cache.set(allocation.id, allocation)
+        return new Promise((resolve, reject) => {
+            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'POST', { notes: data.note }).then(res => {
+                let allocation = new ServerAllocation(this.client, this.identifier, res.attributes)
+                if (this.client.options.addAPIKeysToCache) this.client.servers.cache.set(allocation.id, allocation)
                 resolve(allocation)
             }).catch(err => {
                 reject(this.client.throwError(err))

@@ -1,11 +1,13 @@
 const Client = require('../../../Client')
 const Server = require('./Server')
+const requests = require('../../../../requests')
 
 class ServerAllocation {
     /**
      * Create a new ServerAllocation class
      * @param {Client} client 
-     * @param {Server} server 
+     * @param {object} server 
+     * @param {string} [server.identifier] The identifier of the server
      * @param {object} data 
      */
     constructor(client, server, data) {
@@ -25,7 +27,13 @@ class ServerAllocation {
      * @returns {Promise<Boolean>} Whether the allocation was deleted
      */
     delete() {
-        return this.server.deleteAllocation({ id: this.id })
+        return new Promise((resolve, reject) => {
+            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
+                resolve(true)
+            }).catch(err => {
+                reject(this.client.throwError(err))
+            })
+        })
     }
 
     /**
@@ -35,7 +43,20 @@ class ServerAllocation {
      * @returns {Promise<ServerAllocation>} The updated allocation
      */
     setNote(data) {
-        return this.server.setAllocationNote({ id: this.id, note: data.note })
+        if (!data) throw new Error('No data provided')
+        if (typeof data !== 'object') throw new TypeError('Data must be an object')
+        if (!data.note) throw new Error('No note provided')
+        if (typeof data.note !== 'string') throw new TypeError('Note must be a string')
+
+        return new Promise((resolve, reject) => {
+            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'POST', { notes: data.note}).then(res => {
+                let allocation = new ServerAllocation(this.client, this.server, res.attributes)
+                if (this.client.options.addAPIKeysToCache) this.client.servers.cache.set(allocation.id, allocation)
+                resolve(allocation)
+            }).catch(err => {
+                reject(this.client.throwError(err))
+            })
+        })
     }
 }
 
