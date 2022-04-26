@@ -1,8 +1,9 @@
 const requests = require('../requests');
-const APIKey = require('./Classes/Client/Account/APIKey');
+const APIKey = require('./Classes/Client/User/APIKey');
 const { default: Collection } = require('@pteromanager/collection');
 const ClientServerManager = require('./Classes/Client/Managers/ClientServerManager')
 const ClientAPIKeyManager = require('./Classes/Client/Managers/ClientAPIKeyManager')
+const ClientUserManager = require('./Classes/Client/Managers/ClientUserManager')
 
 class Client {
     /**
@@ -47,7 +48,7 @@ class Client {
             this.options.addAllocationsToCache = true;
         }
 
-        this.APIKeys = new ClientAPIKeyManager(this)
+        this.user = new ClientUserManager(this);
         this.servers = new ClientServerManager(this);
     }
 

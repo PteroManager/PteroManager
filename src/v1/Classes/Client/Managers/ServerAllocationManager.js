@@ -1,8 +1,6 @@
-const Client = require("../../../Client");
-const Server = require("./Server");
-const { default: Collection } = require("@pteromanager/collection");
-const ServerAllocation = require("./ServerAllocation");
-const requests = require("../../../../requests");
+const Client = require('../../../Client')
+const { default: Collection } = require('@pteromanager/collection')
+const ServerAllocation = require('../Server/ServerAllocation')
 
 class ServerAllocationManager {
     /**
@@ -10,7 +8,7 @@ class ServerAllocationManager {
      * @param {Client} client The PteroManager client
      * @param {object} server The server
      * @param {string} [server.identifier] The server identifier
-     * @param {object} data The data
+     * @param {Array} data The data
      */
     constructor(client, server, data) {
         this.client = client;
@@ -24,7 +22,10 @@ class ServerAllocationManager {
 
         if (this.client.options.addAllocationsToCache) {
             data.forEach(allocation => {
-                this.cache.set(allocation.attributes.id, new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes));
+                console.log('Hello')
+                console.log(allocation)
+                let allocationClass = new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes)
+                this.cache.set(allocation.attributes.id, allocationClass);
             });
         }
     }

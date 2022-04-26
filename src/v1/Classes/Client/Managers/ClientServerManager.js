@@ -11,6 +11,10 @@ class ClientServerManager {
     constructor(client) {
         this.client = client;
 
+        /**
+         * The cached servers
+         * @type {Collection<string, Server>} The servers
+         */
         this.cache = new Collection();
     }
     /**

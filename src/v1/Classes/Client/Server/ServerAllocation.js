@@ -1,6 +1,7 @@
 const Client = require('../../../Client')
 const Server = require('./Server')
-const requests = require('../../../../requests')
+const requests = require('../../../../requests');
+const ServerAllocationManager = require('../Managers/ServerAllocationManager');
 
 class ServerAllocation {
     /**
@@ -43,7 +44,7 @@ class ServerAllocation {
      * @returns {Promise<ServerAllocation>} The updated allocation
      */
     setNote(data) {
-        if (!data) throw new Error('No data provided')
+        /*if (!data) throw new Error('No data provided')
         if (typeof data !== 'object') throw new TypeError('Data must be an object')
         if (!data.note) throw new Error('No note provided')
         if (typeof data.note !== 'string') throw new TypeError('Note must be a string')
@@ -56,7 +57,9 @@ class ServerAllocation {
             }).catch(err => {
                 reject(this.client.throwError(err))
             })
-        })
+        })*/
+
+        // ServerAllocationManager(this.client, { identifier: this.server.identifier }, []).setNote({ id: this.id, note: data.note })
     }
 }
 
