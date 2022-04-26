@@ -12,6 +12,7 @@ class Server {
      * @param {object} metadata The metadata
      */
     constructor(client, data, metadata) {
+        if(!metadata) metadata = {}
         this.client = client;
 
         this.serverOwner = data.server_owner;

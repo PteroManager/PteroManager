@@ -59,7 +59,7 @@ class ServerAllocation {
             })
         })*/
 
-        // ServerAllocationManager(this.client, { identifier: this.server.identifier }, []).setNote({ id: this.id, note: data.note })
+        return new ServerAllocationManager(this.client, { identifier: this.server.identifier }, []).setNote({ id: this.id, note: data.note })
     }
 }
 

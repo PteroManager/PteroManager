@@ -1,6 +1,11 @@
 const Client = require('../../../Client')
 const { default: Collection } = require('@pteromanager/collection')
-const ServerAllocation = require('../Server/ServerAllocation')
+const requests = require('../../../../requests')
+let ServerAllocation;
+
+setTimeout(() => {
+    ServerAllocation = require('../Server/ServerAllocation')
+}, 100)
 
 class ServerAllocationManager {
     /**
@@ -14,16 +19,16 @@ class ServerAllocationManager {
         this.client = client;
         this.server = server;
 
+        // Do NOT move this, it loads this file before the ServerAllocation file
+        const ServerAllocation = require('../Server/ServerAllocation')
         /**
-         * The allocations for this server
-         * @type {Collection<string, ServerAllocation>} The allocations
+         * The cache
+         * @type {Collection<number, ServerAllocation>}
          */
         this.cache = new Collection();
 
         if (this.client.options.addAllocationsToCache) {
             data.forEach(allocation => {
-                console.log('Hello')
-                console.log(allocation)
                 let allocationClass = new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes)
                 this.cache.set(allocation.attributes.id, allocationClass);
             });
@@ -32,7 +37,7 @@ class ServerAllocationManager {
 
     /**
      * Fetch the allocations for this server
-     * @returns {Promise<Collection<number, ServerAllocation>>} The allocations
+     * @returns {Promise<Collection<number, module('../Server/ServerAllocation')>>} The allocations
      */
     fetch() {
         return new Promise((resolve, reject) => {
