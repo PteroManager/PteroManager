@@ -20,13 +20,13 @@ class ClientAPIKeyManager {
      */
     fetch() {
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account/api-keys`, this.client.APIKey, 'GET', {}).then(res => {
+            this.client._request(`${this.client.host}/account/api-keys`, this.client.APIKey, 'GET', {}).then(res => {
                 let keys = new Collection();
                 res.data.forEach(key => {
                     keys.set(key.attributes.identifier, new APIKey(this.client, key.attributes))
                 })
 
-                if (this.client.options.addAPIKeysToCache) {
+                if (this.client.options.enableCache) {
                     res.data.forEach(key => {
                         this.cache.set(key.attributes.identifier, new APIKey(this.client, key.attributes))
                     })
@@ -34,7 +34,7 @@ class ClientAPIKeyManager {
 
                 resolve(keys)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -53,12 +53,12 @@ class ClientAPIKeyManager {
         if (typeof data.description !== 'string') throw new TypeError('Description must be a string')
         if (data.allowedIPs && !Array.isArray(data.allowedIPs)) throw new TypeError('Allowed IPs must be an array')
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account/api-keys`, this.client.APIKey, 'POST', { description: data.description, allowed_ips: (data.allowedIPs || [])}).then(res => {
+            this.client._request(`${this.client.host}/account/api-keys`, this.client.APIKey, 'POST', { description: data.description, allowed_ips: (data.allowedIPs || [])}).then(res => {
                 let key = new APIKey(this.client, res.attributes, res.meta)
-                if (this.client.options.addAPIKeysToCache) this.cache.set(key.identifier, key)
+                if (this.client.options.enableCache) this.cache.set(key.identifier, key)
                 resolve(key)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -75,11 +75,11 @@ class ClientAPIKeyManager {
         if (!data.identifier) throw new Error('Identifier is required')
         if (typeof data.identifier !== 'string') throw new TypeError('Identifier must be a string')
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account/api-keys/${data.identifier}`, this.client.APIKey, 'DELETE', {}).then(res => {
-                if (this.client.options.addAPIKeysToCache) this.cache.delete(data.identifier)
+            this.client._request(`${this.client.host}/account/api-keys/${data.identifier}`, this.client.APIKey, 'DELETE', {}).then(res => {
+                if (this.client.options.enableCache) this.cache.delete(data.identifier)
                 resolve(true)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }

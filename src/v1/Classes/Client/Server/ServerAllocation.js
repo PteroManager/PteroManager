@@ -29,10 +29,11 @@ class ServerAllocation {
      */
     delete() {
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
+                if(this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.allocations.cache.delete(this.id)
                 resolve(true)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -44,22 +45,36 @@ class ServerAllocation {
      * @returns {Promise<ServerAllocation>} The updated allocation
      */
     setNote(data) {
-        /*if (!data) throw new Error('No data provided')
+        if (!data) throw new Error('No data provided')
         if (typeof data !== 'object') throw new TypeError('Data must be an object')
         if (!data.note) throw new Error('No note provided')
         if (typeof data.note !== 'string') throw new TypeError('Note must be a string')
 
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'POST', { notes: data.note}).then(res => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'POST', { notes: data.note}).then(res => {
                 let allocation = new ServerAllocation(this.client, { identifier: this.server.identifier }, res.attributes)
-                if (this.client.options.addAPIKeysToCache) this.client.servers.cache.set(allocation.id, allocation)
+                if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.allocations.cache.set(this.id, allocation)
                 resolve(allocation)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
-        })*/
+        })
+    }
 
-        return new ServerAllocationManager(this.client, { identifier: this.server.identifier }, []).setNote({ id: this.id, note: data.note })
+    /**
+     * Set this allocation as the primary allocation
+     * @returns {Promise<ServerAllocation>} The updated allocation
+     */
+    setPrimary() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}/primary`, this.client.APIKey, 'POST', { is_default: true }).then(res => {
+                let allocation = new ServerAllocation(this.client, { identifier: this.server.identifier }, res.attributes)
+                if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.allocations.cache.set(this.id, allocation)
+                resolve(allocation)
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
     }
 }
 

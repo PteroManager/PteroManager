@@ -46,12 +46,12 @@ class ClientServerManager {
 
             if (includes.length > 0) query += `?include=${includes.join(',')}`;
 
-            requests(`${this.client.host}/servers/${data.identifier}${query}`, this.client.APIKey, 'GET', {}).then(res => {
+            this.client._request(`${this.client.host}/servers/${data.identifier}${query}`, this.client.APIKey, 'GET', {}).then(res => {
                 let server = new Server(this.client, res.attributes, res.meta)
-                if (this.client.options.addServersToCache) this.cache.set(server.identifier, server)
+                if (this.client.options.enableCache) this.cache.set(server.identifier, server)
                 resolve(server)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -90,16 +90,16 @@ class ClientServerManager {
             if (includes.length > 0) query += pagination
             else if(pagination.length > 0) query += '?' + pagination.replace('&', '')
 
-            requests(`${this.client.host}/${query}`, this.client.APIKey, 'GET', {}).then(res => {
+            this.client._request(`${this.client.host}/${query}`, this.client.APIKey, 'GET', {}).then(res => {
                 let servers = new Collection();
                 res.data.forEach(server => {
-                    let s = new Server(this.client, server.attributes, server.meta)
-                    if (this.client.options.addServersToCache) this.cache.set(s.identifier, s)
+                    let s = new Server(this.client, server.attributes)
+                    if (this.client.options.enableCache) this.cache.set(s.identifier, s)
                     servers.set(s.identifier, s)
                 })
                 resolve(servers)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }

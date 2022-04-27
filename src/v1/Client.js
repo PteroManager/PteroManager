@@ -11,10 +11,7 @@ class Client {
      * @param {string} host The url of the Pterodactyl Panel
      * @param {string} APIKey The APIKey of the Client
      * @param {object} options The options
-     * @param {boolean} [options.addEverythingToCache] For the lazy people
-     * @param {boolean} [options.addServersToCache] Whether to cache the fetched data of the servers
-     * @param {boolean} [options.addAPIKeysToCache] Whether to cache the fetched data of the APIKeys
-     * @param {boolean} [options.addAllocationsToCache] Whether to cache the fetched data of the Allocations
+     * @param {object} [options.enableCache] Whether to enable the cache
      */
     constructor(host, APIKey, options) {
         if (!host) {
@@ -42,12 +39,6 @@ class Client {
 
         this.options = options || {};
 
-        if (options && options.addEverythingToCache) {
-            this.options.addServersToCache = true;
-            this.options.addAPIKeysToCache = true;
-            this.options.addAllocationsToCache = true;
-        }
-
         this.user = new ClientUserManager(this);
         this.servers = new ClientServerManager(this);
     }
@@ -58,10 +49,17 @@ class Client {
      * @returns {string|object|Error|TypeError} The error
      * @private
      */
-    throwError(error) {
+    _throwError(error) {
         if (error.response && error.response.data) return error.response.data;
         else if (error.response && error.response.status) return error.response.status;
         else return error;
+    }
+
+    /**
+     * @private
+     */
+    _request(...args) {
+        return requests(...args);
     }
 }
 

@@ -28,7 +28,7 @@ class ClientUserManager {
      */
     getAccountDetails() {
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account`, this.client.APIKey, 'GET', {}).then(res => {
+            this.client._request(`${this.client.host}/account`, this.client.APIKey, 'GET', {}).then(res => {
                 this.email = res.attributes.email;
                 this.username = res.attributes.username;
                 this.admin = res.attributes.admin;
@@ -38,7 +38,7 @@ class ClientUserManager {
                 this.language = res.attributes.language;
                 resolve(this)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -49,10 +49,10 @@ class ClientUserManager {
      */
     getTwoFactorAuthDetails() {
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account/two-factor`, this.client.APIKey, 'GET', {}).then(res => {
+            this.client._request(`${this.client.host}/account/two-factor`, this.client.APIKey, 'GET', {}).then(res => {
                 resolve(res.data)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -69,10 +69,10 @@ class ClientUserManager {
         if (!data.code) throw new Error('Code is required');
         if (typeof data.code !== 'string') throw new TypeError('Code must be a string');
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account/two-factor`, this.client.APIKey, 'POST', { code: data.code }).then(res => {
+            this.client._request(`${this.client.host}/account/two-factor`, this.client.APIKey, 'POST', { code: data.code }).then(res => {
                 resolve(res.attributes)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -89,10 +89,10 @@ class ClientUserManager {
         if (!data.password) throw new Error('Password is required');
         if (typeof data.password !== 'string') throw new TypeError('Password must be a string');
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account/two-factor`, this.client.APIKey, 'DELETE', { password: data.password }).then(res => {
+            this.client._request(`${this.client.host}/account/two-factor`, this.client.APIKey, 'DELETE', { password: data.password }).then(res => {
                 resolve(true)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -112,11 +112,11 @@ class ClientUserManager {
         if (!data.password) throw new Error('Password is required');
         if (typeof data.password !== 'string') throw new TypeError('Password must be a string');
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account/email`, this.client.APIKey, 'PUT', { email: data.email, password: data.password }).then(res => {
+            this.client._request(`${this.client.host}/account/email`, this.client.APIKey, 'PUT', { email: data.email, password: data.password }).then(res => {
                 this.email = data.email;
                 resolve(this)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -136,10 +136,10 @@ class ClientUserManager {
         if (!data.newPassword) throw new Error('New Password is required');
         if (typeof data.newPassword !== 'string') throw new TypeError('New Password must be a string');
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/account/password`, this.client.APIKey, 'PUT', { current_password: data.oldPassword, password: data.newPassword, password_confirmation: data.newPassword }).then(res => {
+            this.client._request(`${this.client.host}/account/password`, this.client.APIKey, 'PUT', { current_password: data.oldPassword, password: data.newPassword, password_confirmation: data.newPassword }).then(res => {
                 resolve(true)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }

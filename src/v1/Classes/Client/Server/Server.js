@@ -3,6 +3,7 @@ const { default: Collection } = require('@pteromanager/collection');
 const ServerAllocation = require('./ServerAllocation');
 const requests = require('../../../../requests');
 const ServerAllocationManager = require('../Managers/ServerAllocationManager');
+const ServerVariableManager = require('../Managers/ServerVariableManager');
 
 class Server {
     /**
@@ -12,7 +13,6 @@ class Server {
      * @param {object} metadata The metadata
      */
     constructor(client, data, metadata) {
-        if(!metadata) metadata = {}
         this.client = client;
 
         this.serverOwner = data.server_owner;
@@ -38,7 +38,9 @@ class Server {
         }
         this.isSuspended = data.is_suspended;
         this.isInstalling = data.is_installing;
-        this.userPermissions = metadata.user_permissions;
+        if (metadata) {
+            this.userPermissions = metadata.user_permissions;
+        }
         this.invocation = data.invocation;
         this.dockerImage = data.docker_image;
         this.eggFeatures = data.egg_features;
@@ -46,6 +48,9 @@ class Server {
         this.isTransferring = data.is_transferring;
 
         this.allocations = new ServerAllocationManager(this.client, this, data.relationships.allocations.data);
+
+        this.variables = new ServerVariableManager(this.client, { identifier: this.identifier }, data.relationships.variables.data, data.relationships.variables.meta);
+
     }
 }
 

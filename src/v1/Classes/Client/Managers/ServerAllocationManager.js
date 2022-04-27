@@ -1,11 +1,6 @@
 const Client = require('../../../Client')
 const { default: Collection } = require('@pteromanager/collection')
 const requests = require('../../../../requests')
-let ServerAllocation;
-
-setTimeout(() => {
-    ServerAllocation = require('../Server/ServerAllocation')
-}, 100)
 
 class ServerAllocationManager {
     /**
@@ -27,7 +22,7 @@ class ServerAllocationManager {
          */
         this.cache = new Collection();
 
-        if (this.client.options.addAllocationsToCache) {
+        if (this.client.options.enableCache) {
             data.forEach(allocation => {
                 let allocationClass = new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes)
                 this.cache.set(allocation.attributes.id, allocationClass);
@@ -37,35 +32,39 @@ class ServerAllocationManager {
 
     /**
      * Fetch the allocations for this server
-     * @returns {Promise<Collection<number, module('../Server/ServerAllocation')>>} The allocations
+     * @returns {Promise<Collection<number, import('../Server/ServerAllocation')>>} The allocations
      */
     fetch() {
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations`, this.client.APIKey, 'GET', {}).then(res => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations`, this.client.APIKey, 'GET', {}).then(res => {
                 let allocations = new Collection();
                 res.forEach(allocation => {
-                    if (this.client.options.addAllocationsToCache) this.cache.set(allocation.attributes.id, new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes));
+                    const ServerAllocation = require('../Server/ServerAllocation')
+
+                    if (this.client.options.enableCache) this.cache.set(allocation.attributes.id, new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes));
                     allocations.set(allocation.attributes.id, new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes));
                 });
                 resolve(allocations);
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
 
     /**
      * Create a new allocation for the current server
-     * @returns {Promise<ServerAllocation>}
+     * @returns {Promise<import('../Server/ServerAllocation')>}
      */
     create() {
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations`, this.client.APIKey, 'POST', {}).then(res => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations`, this.client.APIKey, 'POST', {}).then(res => {
+                const ServerAllocation = require('../Server/ServerAllocation')
+
                 let allocation = new ServerAllocation(this.client, { identifier: this.server.identifier }, res.attributes);
-                if (this.client.options.addAllocationsToCache) this.cache.set(allocation.id, allocation);
+                if (this.client.options.enableCache) this.cache.set(allocation.id, allocation);
                 resolve(allocation);
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -75,7 +74,7 @@ class ServerAllocationManager {
      * @param {object} data The data
      * @param {string} [data.note] The note
      * @param {number|string} [data.id] The allocation id
-     * @returns {Promise<ServerAllocation>} The updated allocation
+     * @returns {Promise<import('../Server/ServerAllocation')>} The updated allocation
      */
     setNote(data) {
         if (!data) throw new Error('Data is required');
@@ -85,12 +84,14 @@ class ServerAllocationManager {
         if (!data.note) throw new Error('Note is required');
         if (typeof data.note !== 'string') throw new TypeError('Note must be a string');
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${data.id}`, this.client.APIKey, 'POST', { notes: data.note }).then(res => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${data.id}`, this.client.APIKey, 'POST', { notes: data.note }).then(res => {
+                const ServerAllocation = require('../Server/ServerAllocation')
+
                 let allocation = new ServerAllocation(this.client, { identifier: this.identifier }, res.attributes)
-                if (this.client.options.addAllocationsToCache) this.cache.set(allocation.id, allocation)
+                if (this.client.options.enableCache) this.cache.set(allocation.id, allocation)
                 resolve(allocation)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -99,7 +100,7 @@ class ServerAllocationManager {
      * Set the primary allocation
      * @param {object} [data] The data
      * @param {number|string} [data.id] The allocation id
-     * @returns {Promise<ServerAllocation>} The updated allocation
+     * @returns {Promise<import('../Server/ServerAllocation')>} The updated allocation
      */
     setPrimary(data) {
         if (!data) throw new Error('Data is required');
@@ -107,12 +108,14 @@ class ServerAllocationManager {
         if (!data.id) throw new Error('ID is required');
         if (typeof data.id !== 'string' && typeof data.id !== 'number') throw new TypeError('ID must be a string or number');
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${data.id}/primary`, this.client.APIKey, 'POST', {}).then(res => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${data.id}/primary`, this.client.APIKey, 'POST', {}).then(res => {
+                const ServerAllocation = require('../Server/ServerAllocation')
+
                 let allocation = new ServerAllocation(this.client, { identifier: this.identifier }, res.attributes)
-                if (this.client.options.addAllocationsToCache) this.cache.set(allocation.id, allocation)
+                if (this.client.options.enableCache) this.cache.set(allocation.id, allocation)
                 resolve(allocation)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -129,11 +132,11 @@ class ServerAllocationManager {
         if (!data.id) throw new Error('ID is required');
         if (typeof data.id !== 'string' && typeof data.id !== 'number') throw new TypeError('ID must be a string or number');
         return new Promise((resolve, reject) => {
-            requests(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${data.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
-                if (this.client.options.addAllocationsToCache) this.cache.delete(allocation.id)
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${data.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
+                if (this.client.options.enableCache) this.cache.delete(allocation.id)
                 resolve(true)
             }).catch(err => {
-                reject(this.client.throwError(err))
+                reject(this.client._throwError(err))
             })
         })
     }
