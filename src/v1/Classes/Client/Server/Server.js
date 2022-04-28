@@ -4,6 +4,7 @@ const ServerAllocation = require('./ServerAllocation');
 const requests = require('../../../../requests');
 const ServerAllocationManager = require('../Managers/ServerAllocationManager');
 const ServerVariableManager = require('../Managers/ServerVariableManager');
+const ServerSubuserManager = require('../Managers/ServerSubuserManager');
 
 class Server {
     /**
@@ -51,6 +52,14 @@ class Server {
 
         this.variables = new ServerVariableManager(this.client, { identifier: this.identifier }, data.relationships.variables.data, data.relationships.variables.meta);
 
+        if (data.relationships.egg) {
+            this.egg = {
+                uuid: data.relationships.egg.attributes.uuid,
+                name: data.relationships.egg.attributes.name,
+            }
+        }
+
+        this.subusers = new ServerSubuserManager(this.client, { identifier: this.identifier }, data.relationships.subusers.data);
     }
 }
 

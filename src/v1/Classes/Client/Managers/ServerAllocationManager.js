@@ -7,7 +7,7 @@ class ServerAllocationManager {
      * Create a new ServerAllocationManager class
      * @param {Client} client The PteroManager client
      * @param {object} server The server
-     * @param {string} [server.identifier] The server identifier
+     * @param {string} server.identifier The server identifier
      * @param {Array} data The data
      */
     constructor(client, server, data) {
@@ -22,12 +22,10 @@ class ServerAllocationManager {
          */
         this.cache = new Collection();
 
-        if (this.client.options.enableCache) {
-            data.forEach(allocation => {
-                let allocationClass = new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes)
-                this.cache.set(allocation.attributes.id, allocationClass);
-            });
-        }
+        data.forEach(allocation => {
+            let allocationClass = new ServerAllocation(this.client, { identifier: this.server.identifier }, allocation.attributes)
+            this.cache.set(allocation.attributes.id, allocationClass);
+        });
     }
 
     /**
@@ -72,8 +70,8 @@ class ServerAllocationManager {
     /**
      * Set the note for a server allocation
      * @param {object} data The data
-     * @param {string} [data.note] The note
-     * @param {number|string} [data.id] The allocation id
+     * @param {string} data.note The note
+     * @param {number|string} data.id The allocation id
      * @returns {Promise<import('../Server/ServerAllocation')>} The updated allocation
      */
     setNote(data) {
@@ -98,8 +96,8 @@ class ServerAllocationManager {
 
     /**
      * Set the primary allocation
-     * @param {object} [data] The data
-     * @param {number|string} [data.id] The allocation id
+     * @param {object} data The data
+     * @param {number|string} data.id The allocation id
      * @returns {Promise<import('../Server/ServerAllocation')>} The updated allocation
      */
     setPrimary(data) {
@@ -122,8 +120,8 @@ class ServerAllocationManager {
 
     /**
      * Delete an allocation
-     * @param {object} [data] The data
-     * @param {number|string} [data.id] The allocation id
+     * @param {object} data The data
+     * @param {number|string} data.id The allocation id
      * @returns {Promise<Boolean>} The updated allocation
      */
     delete(data) {

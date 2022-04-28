@@ -7,7 +7,7 @@ class ServerVariableManager {
      * Create a new ServerVariableManager
      * @param {Client} client The PteroManager Client
      * @param {object} server The server
-     * @param {string} [server.identifier] The server identifier
+     * @param {string} server.identifier The server identifier
      * @param {Array} data The data
      * @param {object} metadata The metadata
      */
@@ -20,11 +20,9 @@ class ServerVariableManager {
          */
         this.cache = new Collection();
 
-        if (client.options.enableCache) {
-            data.forEach(variable => {
-                this.cache.set(variable.attributes.env_variable, new ServerVariable(client, server, variable.attributes));
-            });
-        }
+        data.forEach(variable => {
+            this.cache.set(variable.attributes.env_variable, new ServerVariable(client, server, variable.attributes));
+        });
 
         if (metadata) {
             if (metadata.startup_command) {
@@ -58,7 +56,7 @@ class ServerVariableManager {
     /**
      * Update a server variable
      * @param {object} data The data
-     * @param {string} [data.key] The variable key
+     * @param {string} data.key The variable key
      * @param {any} [data.value] The variable value
      * @returns {Promise<ServerVariable>} The server variable
      */
@@ -66,8 +64,7 @@ class ServerVariableManager {
         if (!data) throw new Error('No data provided');
         if (typeof data !== 'object') throw new Error('Data must be an object');
         if (!data.key) throw new Error('No key provided');
-        if(typeof data.key !== 'string') throw new Error('Key must be a string');
-        if (!data.value) throw new Error('No value provided');
+        if (typeof data.key !== 'string') throw new Error('Key must be a string');
 
         return new Promise((resolve, reject) => {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/startup/variable`, this.client.APIKey, 'PUT', data).then(res => {

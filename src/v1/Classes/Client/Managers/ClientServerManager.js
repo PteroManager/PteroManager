@@ -19,8 +19,8 @@ class ClientServerManager {
     }
     /**
      * Fetch All Or A Specific Server
-     * @param {object} [data] The data to send
-     * @param {string} [data.identifier] The identifier of the server
+     * @param {object} data The data to send
+     * @param {string} data.identifier The identifier of the server
      * @param {object} [data.include] The data to include
      * @param {boolean} [data.include.egg] Include the egg
      * @param {boolean} [data.include.subusers] Include the subusers
@@ -58,7 +58,7 @@ class ClientServerManager {
 
     /**
      * Fetch All Servers
-     * @param {object} [data] The data to send
+     * @param {object} data The data to send
      * @param {object} [data.include] The data to include
      * @param {boolean} [data.include.egg] Include the egg
      * @param {boolean} [data.include.subusers] Include the subusers

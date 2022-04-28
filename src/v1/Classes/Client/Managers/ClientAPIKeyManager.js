@@ -42,7 +42,7 @@ class ClientAPIKeyManager {
     /**
      * Create a new API Key
      * @param {object} data The data to send
-     * @param {string} [data.description] The description of the API Key
+     * @param {string} data.description The description of the API Key
      * @param {Array<string>} [data.allowedIPs] The allowed IPs of the API Key
      * @returns {Promise<APIKey>} The API Key
      */
@@ -66,7 +66,7 @@ class ClientAPIKeyManager {
     /**
      * Delete an API Key
      * @param {object} data The data to send
-     * @param {string} [data.identifier] The identifier of the API Key
+     * @param {string} data.identifier The identifier of the API Key
      * @returns {Promise<Boolean>} Whether the API Key was deleted
      */
     delete(data) {

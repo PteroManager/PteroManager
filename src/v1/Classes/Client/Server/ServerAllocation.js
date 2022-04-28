@@ -8,7 +8,7 @@ class ServerAllocation {
      * Create a new ServerAllocation class
      * @param {Client} client 
      * @param {object} server 
-     * @param {string} [server.identifier] The identifier of the server
+     * @param {string} server.identifier The identifier of the server
      * @param {object} data 
      */
     constructor(client, server, data) {
@@ -41,7 +41,7 @@ class ServerAllocation {
     /**
      * Update this allocation
      * @param {object} data The data
-     * @param {string} [data.note] The name of the allocation
+     * @param {string} data.note The name of the allocation
      * @returns {Promise<ServerAllocation>} The updated allocation
      */
     setNote(data) {

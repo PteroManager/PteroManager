@@ -3,7 +3,7 @@ class ServerVariable {
      * Create a new ServerVariable
      * @param {Client} client The PterodactylClient
      * @param {object} server The server
-     * @param {string} [server.identifier] The server identifier
+     * @param {string} server.identifier The server identifier
      * @param {object} data The data
      */
     constructor(client, server, data) {
