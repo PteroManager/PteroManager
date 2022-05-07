@@ -1,6 +1,6 @@
 const Client = require('../../../Client')
 const { default: Collection } = require('@pteromanager/collection')
-const requests = require('../../../../requests')
+const requests = require('../../../requests')
 
 class ServerAllocationManager {
     /**

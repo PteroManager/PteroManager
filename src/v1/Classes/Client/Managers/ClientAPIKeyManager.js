@@ -1,5 +1,5 @@
 const Client = require('../../../Client');
-const requests = require('../../../../requests')
+const requests = require('../../../requests')
 const { default: Collection } = require('@pteromanager/collection');
 const APIKey = require('../User/APIKey')
 

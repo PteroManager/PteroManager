@@ -1,5 +1,5 @@
 const ClientAPIKeyManager = require('./ClientAPIKeyManager')
-const requests = require('../../../../requests');
+const requests = require('../../../requests');
 const Client = require('../../../Client')
 
 class ClientUserManager {

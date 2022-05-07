@@ -1,6 +1,6 @@
 const Client = require('../../../Client')
 const Server = require('./Server')
-const requests = require('../../../../requests');
+const requests = require('../../../requests');
 const ServerAllocationManager = require('../Managers/ServerAllocationManager');
 
 class ServerAllocation {

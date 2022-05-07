@@ -20,8 +20,8 @@ class ServerDatabase {
         this.connectionsFrom = data.connections_from;
         this.maxConnections = data.max_connections;
 
-        if (this.relationships?.password?.attributes) {
-            this.password = this.relationships.password.attributes.password;
+        if (data.relationships?.password?.attributes) {
+            this.password = data.relationships.password.attributes.password;
         }
     }
 

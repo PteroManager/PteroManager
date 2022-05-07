@@ -1,4 +1,4 @@
-const requests = require('../requests');
+const requests = require('./requests');
 const APIKey = require('./Classes/Client/User/APIKey');
 const { default: Collection } = require('@pteromanager/collection');
 const ClientServerManager = require('./Classes/Client/Managers/ClientServerManager')
@@ -63,8 +63,13 @@ class Client {
      * @private
      */
     _request(path, APIKey, method, body) {
-        return requests(path, APIKey, method, body);
+        return requests(path, APIKey, method, body, this);
     }
+
+    /**
+     * @private
+     */
+    _requestsRemaining = 1;
 }
 
 module.exports = Client;
