@@ -16,9 +16,9 @@ class ClientAPIKeyManager {
 
     /**
      * Fetch all or a specific API Key
-     * @returns {Promise<Collection>} The API Keys
+     * @returns {Promise<Collection<string, object>>} The API Keys
      */
-    fetch() {
+    fetchAll() {
         return new Promise((resolve, reject) => {
             this.client._request(`${this.client.host}/account/api-keys`, this.client.APIKey, 'GET', {}).then(res => {
                 let keys = new Collection();

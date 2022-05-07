@@ -38,7 +38,7 @@ class ServerVariableManager {
      * Fetch the server variables
      * @returns {Promise<Collection<string, ServerVariable>>} The server variables
      */
-    fetch() {
+    fetchAll() {
         return new Promise((resolve, reject) => {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/startup`, this.client.APIKey, 'GET', {}).then(res => {
                 let variables = new Collection();

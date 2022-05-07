@@ -56,10 +56,14 @@ class Client {
     }
 
     /**
+     * @param {string} path The path
+     * @param {string} APIKey The APIKey
+     * @param {string} method The method
+     * @param {object} body The body
      * @private
      */
-    _request(...args) {
-        return requests(...args);
+    _request(path, APIKey, method, body) {
+        return requests(path, APIKey, method, body);
     }
 }
 

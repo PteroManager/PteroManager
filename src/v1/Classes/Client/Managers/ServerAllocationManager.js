@@ -32,7 +32,7 @@ class ServerAllocationManager {
      * Fetch the allocations for this server
      * @returns {Promise<Collection<number, import('../Server/ServerAllocation')>>} The allocations
      */
-    fetch() {
+    fetchAll() {
         return new Promise((resolve, reject) => {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations`, this.client.APIKey, 'GET', {}).then(res => {
                 let allocations = new Collection();

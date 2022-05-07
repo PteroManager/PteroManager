@@ -5,6 +5,7 @@ const requests = require('../../../../requests');
 const ServerAllocationManager = require('../Managers/ServerAllocationManager');
 const ServerVariableManager = require('../Managers/ServerVariableManager');
 const ServerSubuserManager = require('../Managers/ServerSubuserManager');
+const ServerDatabaseManager = require('../Managers/ServerDatabaseManager');
 
 class Server {
     /**
@@ -60,6 +61,7 @@ class Server {
         }
 
         this.subusers = new ServerSubuserManager(this.client, { identifier: this.identifier }, data.relationships.subusers.data);
+        this.databases = new ServerDatabaseManager(this.client, this, []);
     }
 }
 
