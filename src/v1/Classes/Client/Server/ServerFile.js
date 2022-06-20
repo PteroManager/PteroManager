@@ -58,7 +58,7 @@ class ServerFile {
      * Rename the file.
      * @param {object} data The data
      * @param {string} data.name The new name
-     * @returns {Promise<ServerFile>} The new ServerFile
+     * @returns {Promise<Boolean>} Whether the rename was successful
      */
     rename(data) {
         if (!data) throw new Error('No data provided');
@@ -68,8 +68,7 @@ class ServerFile {
 
         return new Promise((resolve, reject) => {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/rename`, this.client.APIKey, 'PUT', { root: this.directory, files: [{ from: this.name, to: data.name }] }).then(res => {
-                this.name = data.name;
-                resolve(this);
+                resolve(true);
             }).catch(err => {
                 reject(err);
             })
