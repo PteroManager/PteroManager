@@ -33,12 +33,12 @@ module.exports = async function (path, APIKey, method, body, client) {
 }
 
 async function checkRateLimit(client) {
-    if (client._requestsRemaining <= 0 /* change this to 0 later */) {
+    if (client._requestsRemaining <= 1 /* change this to 0 later */) {
         let toReturn = await new Promise((resolve, reject) => {
             let timeToWait = (60 - new Date().getSeconds()) * 1000;
             console.log(timeToWait)
             setTimeout(async () => {
-                if (client._requestsRemaining <= 0 /* change this to 0 later */) {
+                if (client._requestsRemaining <= 1 /* change this to 0 later */) {
                     return resolve(await checkRateLimit(client));
                 }
                 resolve(true);
