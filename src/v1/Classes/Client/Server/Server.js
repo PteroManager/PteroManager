@@ -62,9 +62,45 @@ class Server {
         }
 
         this.subusers = new ServerSubuserManager(this.client, { identifier: this.identifier }, data.relationships.subusers.data);
+
         this.databases = new ServerDatabaseManager(this.client, this, []);
 
-        this.files = new ServerFileManager(this.client, this)
+        this.files = new ServerFileManager(this.client, this);
+    }
+
+    /**
+     * Rename this server
+     * @param {object} data The data
+     * @param {string} data.name The new name
+     * @returns {Promise<Boolean>} Whether the rename was successful
+     */
+    rename(data) {
+        if (!data) throw new Error('No data provided');
+        if (typeof data !== 'object') throw new Error('Data must be an object');
+        if (!data.name) throw new Error('No name provided');
+        if (typeof data.name !== 'string') throw new Error('Name must be a string');
+
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.identifier}/settings/rename`, this.client.APIKey, 'POST', { name: data.name }).then(res => {
+                resolve(true)
+            }).catch(err => {
+                reject(err)
+            })
+        })
+    }
+
+    /**
+     * Reinstall this server
+     * @returns {Promise<Boolean>} Whether the reinstall was successful
+     */
+    reinstall() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.identifier}/settings/reinstall`, this.client.APIKey, 'POST').then(res => {
+                resolve(true)
+            }).catch(err => {
+                reject(err)
+            })
+        })
     }
 }
 
