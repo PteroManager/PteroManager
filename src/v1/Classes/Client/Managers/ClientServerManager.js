@@ -58,7 +58,7 @@ class ClientServerManager {
 
     /**
      * Fetch All Servers
-     * @param {object} data The data to send
+     * @param {object} [data] The data to send
      * @param {object} [data.include] The data to include
      * @param {boolean} [data.include.egg] Include the egg
      * @param {boolean} [data.include.subusers] Include the subusers
@@ -88,7 +88,7 @@ class ClientServerManager {
             }
 
             if (includes.length > 0) query += pagination
-            else if(pagination.length > 0) query += '?' + pagination.replace('&', '')
+            else if (pagination.length > 0) query += '?' + pagination.replace('&', '')
 
             this.client._request(`${this.client.host}/${query}`, this.client.APIKey, 'GET', {}).then(res => {
                 let servers = new Collection();

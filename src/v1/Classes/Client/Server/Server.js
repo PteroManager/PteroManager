@@ -7,6 +7,8 @@ const ServerVariableManager = require('../Managers/ServerVariableManager');
 const ServerSubuserManager = require('../Managers/ServerSubuserManager');
 const ServerDatabaseManager = require('../Managers/ServerDatabaseManager');
 const ServerFileManager = require('../Managers/ServerFileManager');
+const ServerScheduleManager = require('../Managers/ServerScheduleManager');
+const ServerBackupManager = require('../Managers/ServerBackupManager');
 
 class Server {
     /**
@@ -61,11 +63,23 @@ class Server {
             }
         }
 
-        this.subusers = new ServerSubuserManager(this.client, { identifier: this.identifier }, data.relationships.subusers.data);
+        this.subusers = new ServerSubuserManager(this.client, { identifier: this.identifier }, data.relationships.subusers?.data || []);
 
         this.databases = new ServerDatabaseManager(this.client, this, []);
 
         this.files = new ServerFileManager(this.client, this);
+
+        this.schedules = new ServerScheduleManager(this.client, this, [])
+
+        this.backups = new ServerBackupManager(this.client, this, []);
+    }
+
+    /**
+     * Fetch this server
+     * @returns {Promise<Server>} The server
+     */
+    fetch() {
+        return this.client.servers.fetch(this.identifier);
     }
 
     /**
@@ -84,7 +98,7 @@ class Server {
             this.client._request(`${this.client.host}/servers/${this.identifier}/settings/rename`, this.client.APIKey, 'POST', { name: data.name }).then(res => {
                 resolve(true)
             }).catch(err => {
-                reject(err)
+                reject(this.client._throwError(err))
             })
         })
     }
@@ -98,7 +112,7 @@ class Server {
             this.client._request(`${this.client.host}/servers/${this.identifier}/settings/reinstall`, this.client.APIKey, 'POST').then(res => {
                 resolve(true)
             }).catch(err => {
-                reject(err)
+                reject(this.client._throwError(err))
             })
         })
     }

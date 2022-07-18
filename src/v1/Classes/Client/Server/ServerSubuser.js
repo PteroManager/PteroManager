@@ -27,6 +27,21 @@ class ServerSubuser {
     }
 
     /**
+     * Fetch this subuser
+     * @returns {Promise<ServerSubuser>}
+     */
+    fetch() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/subusers/${this.uuid}`, this.client.APIKey, 'GET', {}).then(res => {
+                if(this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.subusers.cache.set(this.uuid, new ServerSubuser(this.client, this.server, res.attributes));
+                resolve(new ServerSubuser(this.client, this.server, res.attributes));
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            })
+        })
+    }
+
+    /**
      * Update the subuser
      * @param {object} data The data
      * @param {Array<'control.console'|'control.start'|'control.stop'|'control.restart'|'user.create'|'user.read'|'user.update'|'user.delete'|'file.create'|'file.read'|'file.read'|'file.update'|'file.delete'|'file.archive'|'file.sftp'|'backup.create'|'backup.read'|'backup.update'|'backup.delete'|'backup.download'|'allocation.read'|'allocation.create'|'allocation.update'|'allocation.delete'|'startup.read'|'startup.update'|'database.create'|'database.read'|'database.update'|'database.delete'|'database.view_password'|'schedule.create'|'schedule.read'|'schedule.update'|'schedule.delete'|'settings.rename'|'settings.reinstall'>} data.permissions The permissions
@@ -49,7 +64,7 @@ class ServerSubuser {
 
                 resolve(subuser);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             });
         })
     }
@@ -65,7 +80,7 @@ class ServerSubuser {
 
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             });
         })
     }

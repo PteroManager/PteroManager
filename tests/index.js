@@ -5,18 +5,14 @@ const config = require('./config.json')
 const client = new PteroManager.Client(config.panelURL, config.APIKey, { enableCache: true });
 // dd56f84a
 (async () => {
-    client.servers.cache.get().files.compress({
-        directory: '/',
-        files: [
-            'test.txt',
-            'test2.txt',
-            'test3.txt',
-            'test4.txt',
-            'test5.txt',
-            'test6.txt',
-            'test7.txt',
-            'test8.txt',
-            'test9.txt',
-        ]
+    let server = await client.servers.fetch({ identifier: 'dd56f84a' });
+
+    server.backups.fetchAll().then(async res => {
+        let res2 = res.firstValue();
+
+        let link = await res2.getDownloadLink()
+        console.log(link)
+    }).catch(err => {
+        console.log(err);
     })
 })();

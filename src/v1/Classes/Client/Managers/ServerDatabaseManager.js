@@ -8,7 +8,7 @@ class ServerDatabaseManager {
      * @param {Client} client The PteroManager Client
      * @param {object} server The server
      * @param {string} server.identifier The server identifier
-     * @param {object} data The data
+     * @param {Array} data The data
      */
     constructor(client, server, data) {
         this.client = client;

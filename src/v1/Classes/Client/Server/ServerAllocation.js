@@ -24,6 +24,21 @@ class ServerAllocation {
     }
 
     /**
+     * Fetch this allocation
+     * @returns {Promise<ServerAllocation>} The allocation
+     */
+    fetch() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/allocations/${this.id}`, this.client.APIKey, 'GET', {}).then(res => {
+                if(this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.allocations.cache.set(this.id, new ServerAllocation(this.client, this.server, res.attributes))
+                resolve(new ServerAllocation(this.client, this.server, res.attributes));
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            })
+        })
+    }
+
+    /**
      * Delete this allocation
      * @returns {Promise<Boolean>} Whether the allocation was deleted
      */

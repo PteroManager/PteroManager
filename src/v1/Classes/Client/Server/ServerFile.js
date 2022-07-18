@@ -35,7 +35,7 @@ class ServerFile {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/contents?file=${encodeURIComponent(this.directory) + encodeURIComponent(this.name)}`, this.client.APIKey, 'GET', {}).then(res => {
                 resolve(res);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -49,7 +49,7 @@ class ServerFile {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/download?file=${encodeURIComponent(this.directory) + encodeURIComponent(this.name)}`, this.client.APIKey, 'GET', {}).then(res => {
                 resolve(res.attributes.url);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -70,7 +70,7 @@ class ServerFile {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/rename`, this.client.APIKey, 'PUT', { root: this.directory, files: [{ from: this.name, to: data.name }] }).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         });
     }
@@ -91,7 +91,7 @@ class ServerFile {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/copy`, this.client.APIKey, 'POST', { location: this.directory }).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         });
     }
@@ -112,7 +112,7 @@ class ServerFile {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/write?file=${encodeURIComponent(this.directory) + encodeURIComponent(this.name)}`, this.client.APIKey, 'POST', data.contents).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         });
     }
@@ -126,7 +126,7 @@ class ServerFile {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/decompress`, this.client.APIKey, 'POST', { root: this.directory, file: this.name }).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         });
     }
@@ -140,7 +140,7 @@ class ServerFile {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/delete`, this.client.APIKey, 'POST', { root: this.directory, files: [this.name] }).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         });
     }

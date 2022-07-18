@@ -38,7 +38,7 @@ class ServerFileManager {
 
                 resolve(files);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -60,7 +60,7 @@ class ServerFileManager {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/contents?file=${encodedFile}`, this.client.APIKey, 'GET', {}).then(res => {
                 resolve(res);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -82,7 +82,7 @@ class ServerFileManager {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/download?file=${encodedFile}`, this.client.APIKey, 'GET', {}).then(res => {
                 resolve(res.attributes.url);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -119,7 +119,7 @@ class ServerFileManager {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/rename`, this.client.APIKey, 'PUT', { root: data.directory, files }).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -140,7 +140,7 @@ class ServerFileManager {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/copy`, this.client.APIKey, 'POST', { location: data.file }).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -165,7 +165,7 @@ class ServerFileManager {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/write?file=${encodedFile}`, this.client.APIKey, 'POST', data.content).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -190,7 +190,7 @@ class ServerFileManager {
                 let serverfile = new ServerFile(this.client, this.server, res.attributes);
                 resolve(serverfile);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -214,7 +214,7 @@ class ServerFileManager {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/decompress`, this.client.APIKey, 'POST', { root: data.directory, file: data.file }).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -238,7 +238,7 @@ class ServerFileManager {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/delete`, this.client.APIKey, 'POST', { root: data.directory, files: data.files }).then(res => {
                 resolve(true);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -263,7 +263,7 @@ class ServerFileManager {
                 let serverfile = new ServerFile(this.client, this.server, res.attributes);
                 resolve(serverfile);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }
@@ -277,7 +277,7 @@ class ServerFileManager {
             this.client._request(`${this.client.host}/servers/${this.server.identifier}/files/upload`, this.client.APIKey, 'GET').then(res => {
                 resolve(res.attributes.url);
             }).catch(err => {
-                reject(err);
+                reject(this.client._throwError(err));
             })
         })
     }

@@ -1,8 +1,5 @@
 const Client = require('../../../Client');
 
-/**
- * @typedef {Object} APIKey
- */
 class APIKey {
     /**
      * Create a new API Key class
@@ -32,11 +29,6 @@ class APIKey {
      */
     delete() {
         return this.client.APIKeys.delete({ identifier: this.identifier });
-    }
-
-
-    toJSON() {
-        return { identifier: this.identifier, description: this.description, createdAt: this.createdAt, lastUsedAt: this.lastUsedAt, allowedIPs: this.allowedIPs };
     }
 }
 

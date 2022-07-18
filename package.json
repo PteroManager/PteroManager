@@ -11,7 +11,13 @@
     "type": "git",
     "url": "git+https://github.com/PteroManager/PteroManager.git"
   },
-  "keywords": ["pteromanager", "pterodactyl", "pterodactyl-manager", "api", "api-wrapper"],
+  "keywords": [
+    "pteromanager",
+    "pterodactyl",
+    "pterodactyl-manager",
+    "api",
+    "api-wrapper"
+  ],
   "contributors": [
     "Jeweetzelf (jeweetzelf@pteromanager.ga)",
     "Dotto (dotto@pteromanager.ga)",
@@ -25,8 +31,5 @@
   "dependencies": {
     "@pteromanager/collection": "^1.1.0",
     "axios": "^0.26.1"
-  },
-  "devDependencies": {
-    "typescript": "^4.6.3"
   }
 }

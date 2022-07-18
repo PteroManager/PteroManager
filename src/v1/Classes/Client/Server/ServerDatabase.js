@@ -26,6 +26,21 @@ class ServerDatabase {
     }
 
     /**
+     * Fetch this database
+     * @returns {Promise<ServerDatabase>} Returns the database
+     */
+    fetch() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/databases/${this.id}`, this.client.APIKey, 'GET', {}).then(res => {
+                if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.databases.cache.set(this.id, new ServerDatabase(this.client, this.server, res.attributes))
+                resolve(new ServerDatabase(this.client, this.server, res.attributes))
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
+    }
+
+    /**
      * Reset this database's password
      * @returns {Promise<ServerDatabase>} Returns the database, which includes the newly generated password.
      */
@@ -36,7 +51,7 @@ class ServerDatabase {
                 if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.databases.cache.set(this.id, database)
                 resolve(database)
             }).catch(err => {
-                reject(err)
+                reject(this.client._throwError(err))
             })
         })
     }
