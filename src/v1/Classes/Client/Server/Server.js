@@ -116,6 +116,27 @@ class Server {
             })
         })
     }
+
+    /**
+     * Sends a power signal to the server
+     * @param {object} data The data
+     * @param {'start' | 'stop' | 'restart' | 'kill'} data.signal The signal to send
+     * @returns {Promise<Boolean>} Whether the signal was successful
+     */
+    setPowerSignal(data) {
+        if (!data) throw new Error('No data provided');
+        if (typeof data !== 'object') throw new Error('Data must be an object');
+        if (!data.signal) throw new Error('No signal provided');
+        if (typeof data.signal !== 'string') throw new Error('Signal must be a string');
+
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.identifier}/power`, this.client.APIKey, 'POST', { signal: data.signal }).then(res => {
+                resolve(true)
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
+    }
 }
 
 module.exports = Server;

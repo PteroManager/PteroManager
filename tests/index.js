@@ -7,12 +7,7 @@ const client = new PteroManager.Client(config.panelURL, config.APIKey, { enableC
 (async () => {
     let server = await client.servers.fetch({ identifier: 'dd56f84a' });
 
-    server.backups.fetchAll().then(async res => {
-        let res2 = res.firstValue();
-
-        let link = await res2.getDownloadLink()
-        console.log(link)
-    }).catch(err => {
-        console.log(err);
+    server.setPowerSignal({ signal: 'stop'}).catch(err => {
+        console.log(err)
     })
 })();
