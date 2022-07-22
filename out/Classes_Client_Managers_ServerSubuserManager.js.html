@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Classes/Client/Managers/ServerSubuserManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Classes/Client/Managers/ServerSubuserManager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Client = require('../../../Client');
+const { default: Collection } = require('@pteromanager/collection');
+const ServerSubuser = require('../Server/ServerSubuser');
+
+class ServerSubuserManager {
+    /**
+     * Create a new ServerSubuserManager
+     * @param {Client} client The PteroManager Client
+     * @param {object} server The server
+     * @param {string} server.identifier The server identifier
+     * @param {object} data The data
+     */
+    constructor(client, server, data) {
+        this.client = client;
+        this.server = server;
+
+        /**
+         * The cache
+         * @type {Collection&lt;string, ServerSubuser>}
+         */
+        this.cache = new Collection();
+
+        data.forEach(subuser => {
+            this.cache.set(subuser.attributes.uuid, new ServerSubuser(this.client, this.server, subuser));
+        });
+    }
+
+    /**
+     * Fetch the subusers
+     * @returns {Promise&lt;Collection&lt;string, ServerSubuser>>}
+     */
+    fetchAll() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/users`, this.client.APIKey, 'GET', {}).then(res => {
+                let subusers = new Collection();
+                res.data.forEach(subuser => {
+                    if (this.client.options.enableCache) this.cache.set(subuser.attributes.uuid, new ServerSubuser(this.client, this.server, subuser.attributes));
+                    subusers.set(subuser.attributes.uuid, new ServerSubuser(this.client, this.server, subuser.attributes));
+                });
+                resolve(subusers);
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            });
+        })
+    }
+
+    /**
+     * Create a new subuser
+     * @param {object} data The data
+     * @param {string} data.email The email of the subuser
+     * @param {Array&lt;'control.console'|'control.start'|'control.stop'|'control.restart'|'user.create'|'user.read'|'user.update'|'user.delete'|'file.create'|'file.read'|'file.read'|'file.update'|'file.delete'|'file.archive'|'file.sftp'|'backup.create'|'backup.read'|'backup.update'|'backup.delete'|'backup.download'|'allocation.read'|'allocation.create'|'allocation.update'|'allocation.delete'|'startup.read'|'startup.update'|'database.create'|'database.read'|'database.update'|'database.delete'|'database.view_password'|'schedule.create'|'schedule.read'|'schedule.update'|'schedule.delete'|'settings.rename'|'settings.reinstall'>} data.permissions The permissions
+     * @returns {Promise&lt;ServerSubuser>} The subuser
+     */
+    create(data) {
+        if (!data) throw new Error('Data is required');
+        if (typeof data !== 'object') throw new TypeError('Data must be an object');
+        if (!data.email) throw new Error('Email is required');
+        if (typeof data.email !== 'string') throw new TypeError('Email must be a string');
+        if (!data.permissions) throw new Error('Permissions is required');
+        if (!Array.isArray(data.permissions)) throw new TypeError('Permissions must be an array');
+
+        let validPerms = ['control.console', 'control.start', 'control.stop', 'control.restart', 'user.create', 'user.read', 'user.update', 'user.delete', 'file.create', 'file.read', 'file.read', 'file.update', 'file.delete', 'file.archive', 'file.sftp', 'backup.create', 'backup.read', 'backup.update', 'backup.delete', 'backup.download', 'allocation.read', 'allocation.create', 'allocation.update', 'allocation.delete', 'startup.read', 'startup.update', 'database.create', 'database.read', 'database.update', 'database.delete', 'database.view_password', 'schedule.create', 'schedule.read', 'schedule.update', 'schedule.delete', 'settings.rename', 'settings.reinstall'];
+        if(!data.permissions.some(perm => validPerms.includes(perm))) throw new Error('Invalid permission(s)');
+
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/users`, this.client.APIKey, 'POST', data).then(res => {
+                let subuser = new ServerSubuser(this.client, this.server, res.attributes);
+                if (this.client.options.enableCache) this.cache.set(subuser.uuid, subuser);
+                resolve(subuser);
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            });
+        })
+    }
+
+    /**
+     * Get a subuser
+     * @param {object} data The data
+     * @param {string} data.uuid The uuid of the subuser
+     * @returns {Promise&lt;ServerSubuser>} The subuser
+     */
+    fetch(data) {
+        if (!data) throw new Error('Data is required');
+        if (typeof data !== 'object') throw new TypeError('Data must be an object');
+        if (!data.uuid) throw new Error('UUID is required');
+        if (typeof data.uuid !== 'string') throw new TypeError('UUID must be a string');
+
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/users/${data.uuid}`, this.client.APIKey, 'GET', {}).then(res => {
+                let subuser = new ServerSubuser(this.client, this.server, res.attributes);
+                if (this.client.options.enableCache) this.cache.set(subuser.uuid, subuser);
+                resolve(subuser);
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            });
+        });
+    }
+
+    /**
+     * Update a subuser
+     * @param {object} data The data
+     * @param {string} data.uuid The uuid of the subuser
+     * @param {Array&lt;'control.console'|'control.start'|'control.stop'|'control.restart'|'user.create'|'user.read'|'user.update'|'user.delete'|'file.create'|'file.read'|'file.read'|'file.update'|'file.delete'|'file.archive'|'file.sftp'|'backup.create'|'backup.read'|'backup.update'|'backup.delete'|'backup.download'|'allocation.read'|'allocation.create'|'allocation.update'|'allocation.delete'|'startup.read'|'startup.update'|'database.create'|'database.read'|'database.update'|'database.delete'|'database.view_password'|'schedule.create'|'schedule.read'|'schedule.update'|'schedule.delete'|'settings.rename'|'settings.reinstall'>} data.permissions The permissions
+     * @returns {Promise&lt;ServerSubuser>} The subuser
+     */
+    update(data) {
+        if (!data) throw new Error('Data is required');
+        if (typeof data !== 'object') throw new TypeError('Data must be an object');
+        if (!data.uuid) throw new Error('UUID is required');
+        if (typeof data.uuid !== 'string') throw new TypeError('UUID must be a string');
+        if (!data.permissions) throw new Error('Permissions is required');
+        if (!Array.isArray(data.permissions)) throw new TypeError('Permissions must be an array');
+
+        let validPerms = ['control.console', 'control.start', 'control.stop', 'control.restart', 'user.create', 'user.read', 'user.update', 'user.delete', 'file.create', 'file.read', 'file.read', 'file.update', 'file.delete', 'file.archive', 'file.sftp', 'backup.create', 'backup.read', 'backup.update', 'backup.delete', 'backup.download', 'allocation.read', 'allocation.create', 'allocation.update', 'allocation.delete', 'startup.read', 'startup.update', 'database.create', 'database.read', 'database.update', 'database.delete', 'database.view_password', 'schedule.create', 'schedule.read', 'schedule.update', 'schedule.delete', 'settings.rename', 'settings.reinstall'];
+        if (!data.permissions.some(perm => validPerms.includes(perm))) throw new Error('Invalid permission(s)');
+
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/users/${data.uuid}`, this.client.APIKey, 'POST', data).then(res => {
+                let subuser = new ServerSubuser(this.client, this.server, res.attributes);
+                if (this.client.options.enableCache) this.cache.set(subuser.uuid, subuser);
+                resolve(subuser);
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            });
+        });
+    }
+
+    /**
+     * Delete a subuser
+     * @param {object} data The data
+     * @param {string} data.uuid The uuid of the subuser
+     * @returns {Promise&lt;Boolean>} If the subuser was deleted
+     */
+    delete(data) {
+        if (!data) throw new Error('Data is required');
+        if (typeof data !== 'object') throw new TypeError('Data must be an object');
+        if (!data.uuid) throw new Error('UUID is required');
+        if (typeof data.uuid !== 'string') throw new TypeError('UUID must be a string');
+
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/users/${data.uuid}`, this.client.APIKey, 'DELETE', {}).then(res => {
+                if (this.client.options.enableCache) this.cache.delete(data.uuid);
+                resolve(true);
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            });
+        });
+    }
+}
+
+module.exports = ServerSubuserManager;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="APIKey.html">APIKey</a></li><li><a href="Client.html">Client</a></li><li><a href="ClientAPIKeyManager.html">ClientAPIKeyManager</a></li><li><a href="ClientServerManager.html">ClientServerManager</a></li><li><a href="ClientUserManager.html">ClientUserManager</a></li><li><a href="Server.html">Server</a></li><li><a href="ServerAllocation.html">ServerAllocation</a></li><li><a href="ServerAllocationManager.html">ServerAllocationManager</a></li><li><a href="ServerBackup.html">ServerBackup</a></li><li><a href="ServerBackupManager.html">ServerBackupManager</a></li><li><a href="ServerDatabase.html">ServerDatabase</a></li><li><a href="ServerDatabaseManager.html">ServerDatabaseManager</a></li><li><a href="ServerFile.html">ServerFile</a></li><li><a href="ServerFileManager.html">ServerFileManager</a></li><li><a href="ServerSchedule.html">ServerSchedule</a></li><li><a href="ServerScheduleManager.html">ServerScheduleManager</a></li><li><a href="ServerScheduleTask.html">ServerScheduleTask</a></li><li><a href="ServerScheduleTaskManager.html">ServerScheduleTaskManager</a></li><li><a href="ServerSubuser.html">ServerSubuser</a></li><li><a href="ServerSubuserManager.html">ServerSubuserManager</a></li><li><a href="ServerVariable.html">ServerVariable</a></li><li><a href="ServerVariableManager.html">ServerVariableManager</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Jul 18 2022 21:22:45 GMT+0200 (Midden-Europese zomertijd)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

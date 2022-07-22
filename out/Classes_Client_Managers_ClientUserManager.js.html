@@ -1,4 +1,32 @@
-const ClientAPIKeyManager = require('./ClientAPIKeyManager')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Classes/Client/Managers/ClientUserManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Classes/Client/Managers/ClientUserManager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const ClientAPIKeyManager = require('./ClientAPIKeyManager')
 const requests = require('../../../requests');
 const Client = require('../../../Client')
 
@@ -18,16 +46,12 @@ class ClientUserManager {
         this.lastName = null;
         this.language = null;
 
-        /**
-         * The Client API Key Manager
-         * @type {ClientAPIKeyManager}
-         */
         this.APIKeys = new ClientAPIKeyManager(this)
     }
 
     /**
      * Get The Current Client's Account Details
-     * @returns {Promise<ClientUserManager>} The Account Details
+     * @returns {Promise&lt;ClientUserManager>} The Account Details
      */
     getAccountDetails() {
         return new Promise((resolve, reject) => {
@@ -48,7 +72,7 @@ class ClientUserManager {
 
     /**
      * Get The Current Client's Two Factor Authentication Details
-     * @returns {Promise<Object>} The Two Factor Authentication Details
+     * @returns {Promise&lt;Object>} The Two Factor Authentication Details
      */
     getTwoFactorAuthDetails() {
         return new Promise((resolve, reject) => {
@@ -64,7 +88,7 @@ class ClientUserManager {
      * Enable The Two Factor Authentication For The Current Client
      * @param {object} data The data
      * @param {string} data.code The code to enable the two factor authentication
-     * @returns {Promise<Object>} The Two Factor Authentication Details
+     * @returns {Promise&lt;Object>} The Two Factor Authentication Details
      */
     enableTwoFactorAuth(data) {
         if (!data) throw new Error('Data is required');
@@ -84,7 +108,7 @@ class ClientUserManager {
      * Disable The Two Factor Authentication For The Current Client
      * @param {object} data The data
      * @param {string} data.password The password of the client
-     * @returns {Promise<Boolean>} The Two Factor Authentication Details
+     * @returns {Promise&lt;Boolean>} The Two Factor Authentication Details
      */
     disableTwoFactorAuth(data) {
         if (!data) throw new Error('Data is required');
@@ -105,7 +129,7 @@ class ClientUserManager {
      * @param {objecr} data The data
      * @param {string} data.email The new email of the client
      * @param {string} data.password The password of the client
-     * @returns {Promise<ClientUserManager>} Wether the email was successfully updated
+     * @returns {Promise&lt;ClientUserManager>} Wether the email was successfully updated
      */
     updateAccountEmail(data) {
         if (!data) throw new Error('Data is required');
@@ -129,7 +153,7 @@ class ClientUserManager {
      * @param {object} data The data
      * @param {string} data.currentPassword The current password of the client
      * @param {string} data.newPassword The new password of the client
-     * @returns {Promise<Boolean>} Wether the password was successfully updated
+     * @returns {Promise&lt;Boolean>} Wether the password was successfully updated
      */
     updateAccountPassword(data) {
         if (!data) throw new Error('Data is required');
@@ -148,4 +172,26 @@ class ClientUserManager {
     }
 }
 
-module.exports = ClientUserManager;
+module.exports = ClientUserManager;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="APIKey.html">APIKey</a></li><li><a href="Client.html">Client</a></li><li><a href="ClientAPIKeyManager.html">ClientAPIKeyManager</a></li><li><a href="ClientServerManager.html">ClientServerManager</a></li><li><a href="ClientUserManager.html">ClientUserManager</a></li><li><a href="Server.html">Server</a></li><li><a href="ServerAllocation.html">ServerAllocation</a></li><li><a href="ServerAllocationManager.html">ServerAllocationManager</a></li><li><a href="ServerBackup.html">ServerBackup</a></li><li><a href="ServerBackupManager.html">ServerBackupManager</a></li><li><a href="ServerDatabase.html">ServerDatabase</a></li><li><a href="ServerDatabaseManager.html">ServerDatabaseManager</a></li><li><a href="ServerFile.html">ServerFile</a></li><li><a href="ServerFileManager.html">ServerFileManager</a></li><li><a href="ServerSchedule.html">ServerSchedule</a></li><li><a href="ServerScheduleManager.html">ServerScheduleManager</a></li><li><a href="ServerScheduleTask.html">ServerScheduleTask</a></li><li><a href="ServerScheduleTaskManager.html">ServerScheduleTaskManager</a></li><li><a href="ServerSubuser.html">ServerSubuser</a></li><li><a href="ServerSubuserManager.html">ServerSubuserManager</a></li><li><a href="ServerVariable.html">ServerVariable</a></li><li><a href="ServerVariableManager.html">ServerVariableManager</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Jul 18 2022 21:22:45 GMT+0200 (Midden-Europese zomertijd)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

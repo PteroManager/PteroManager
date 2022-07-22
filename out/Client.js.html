@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Client.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Client.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const requests = require('./requests');
+const APIKey = require('./Classes/Client/User/APIKey');
+const { default: Collection } = require('@pteromanager/collection');
+const ClientServerManager = require('./Classes/Client/Managers/ClientServerManager')
+const ClientAPIKeyManager = require('./Classes/Client/Managers/ClientAPIKeyManager')
+const ClientUserManager = require('./Classes/Client/Managers/ClientUserManager')
+
+class Client {
+    /**
+     * Create A New Client
+     * @param {string} host The url of the Pterodactyl Panel
+     * @param {string} APIKey The APIKey of the Client
+     * @param {object} options The options
+     * @param {Boolean} [options.enableCache] Whether to enable the cache
+     */
+    constructor(host, APIKey, options) {
+        if (!host) {
+            throw new Error('Host is required');
+        }
+        if (!APIKey) {
+            throw new Error('APIKey is required');
+        }
+
+        if (typeof host !== 'string') throw new TypeError('Host must be a string');
+        if (typeof APIKey !== 'string') throw new TypeError('APIKey must be a string');
+
+        if (!host.startsWith('http://') &amp;&amp; !host.startsWith('https://')) {
+            host = `http://${host}`;
+        }
+
+        if (host.endsWith('/')) {
+            host = host.substring(0, host.length - 1);
+        }
+
+        host += '/api/client'
+
+        /**
+         * @type {String}
+         */
+        this.host = host;
+
+        /**
+         * @type {String}
+         */
+        this.APIKey = APIKey;
+
+        /**
+         * @type {Object} The options
+         * @property {String} [options.enableCache] Whether to enable the cache
+         */
+        this.options = options || {};
+
+        /**
+         * @type {ClientUserManager}
+         */
+        this.user = new ClientUserManager(this);
+
+        /**
+         * @type {ClientServerManager}
+         */
+        this.servers = new ClientServerManager(this);
+    }
+
+    /**
+     * Throw a new error
+     * @param {string|object|Error|TypeError} error The error
+     * @returns {string|object|Error|TypeError} The error
+     * @private
+     */
+    _throwError(error) {
+        if (error.response &amp;&amp; error.response.data) return error.response.data;
+        else if (error.response &amp;&amp; error.response.status) return error.response.status;
+        else return error;
+    }
+
+    /**
+     * @param {string} path The path
+     * @param {string} APIKey The APIKey
+     * @param {string} method The method
+     * @param {object} body The body
+     * @private
+     */
+    _request(path, APIKey, method, body) {
+        return requests(path, APIKey, method, body, this);
+    }
+
+    /**
+     * @private
+     */
+    _requestsRemaining = 1;
+}
+
+module.exports = Client;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="APIKey.html">APIKey</a></li><li><a href="Client.html">Client</a></li><li><a href="ClientAPIKeyManager.html">ClientAPIKeyManager</a></li><li><a href="ClientServerManager.html">ClientServerManager</a></li><li><a href="ClientUserManager.html">ClientUserManager</a></li><li><a href="Server.html">Server</a></li><li><a href="ServerAllocation.html">ServerAllocation</a></li><li><a href="ServerAllocationManager.html">ServerAllocationManager</a></li><li><a href="ServerBackup.html">ServerBackup</a></li><li><a href="ServerBackupManager.html">ServerBackupManager</a></li><li><a href="ServerDatabase.html">ServerDatabase</a></li><li><a href="ServerDatabaseManager.html">ServerDatabaseManager</a></li><li><a href="ServerFile.html">ServerFile</a></li><li><a href="ServerFileManager.html">ServerFileManager</a></li><li><a href="ServerSchedule.html">ServerSchedule</a></li><li><a href="ServerScheduleManager.html">ServerScheduleManager</a></li><li><a href="ServerScheduleTask.html">ServerScheduleTask</a></li><li><a href="ServerScheduleTaskManager.html">ServerScheduleTaskManager</a></li><li><a href="ServerSubuser.html">ServerSubuser</a></li><li><a href="ServerSubuserManager.html">ServerSubuserManager</a></li><li><a href="ServerVariable.html">ServerVariable</a></li><li><a href="ServerVariableManager.html">ServerVariableManager</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Jul 18 2022 21:22:45 GMT+0200 (Midden-Europese zomertijd)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

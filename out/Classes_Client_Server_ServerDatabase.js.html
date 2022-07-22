@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Classes/Client/Server/ServerDatabase.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Classes/Client/Server/ServerDatabase.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Client = require('../../../Client')
+
+class ServerDatabase {
+    /**
+     * Create a new API Key class
+     * @param {Client} client The PteroManager Client
+     * @param {object} server The server object
+     * @param {object} server.identifier The server identifier
+     * @param {object} data The data
+     */
+    constructor(client, server, data) {
+        this.client = client;
+        this.server = server;
+
+        this.id = data.id;
+        this.ip = data.host.address;
+        this.port = data.host.port;
+        this.name = data.name;
+        this.username = data.username;
+        this.connectionsFrom = data.connections_from;
+        this.maxConnections = data.max_connections;
+
+        if (data.relationships?.password?.attributes) {
+            this.password = data.relationships.password.attributes.password;
+        }
+    }
+
+    /**
+     * Fetch this database
+     * @returns {Promise&lt;ServerDatabase>} Returns the database
+     */
+    fetch() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/databases/${this.id}`, this.client.APIKey, 'GET', {}).then(res => {
+                if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.databases.cache.set(this.id, new ServerDatabase(this.client, this.server, res.attributes))
+                resolve(new ServerDatabase(this.client, this.server, res.attributes))
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
+    }
+
+    /**
+     * Reset this database's password
+     * @returns {Promise&lt;ServerDatabase>} Returns the database, which includes the newly generated password.
+     */
+    resetPassword() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/databases/${this.id}/rotate-password`, this.client.APIKey, 'POST', {}).then(res => {
+                let database = new ServerDatabase(this.client, this.server, res.attributes);
+                if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.databases.cache.set(this.id, database)
+                resolve(database)
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
+    }
+
+    /**
+     * Delete this database
+     * @returns {Promise&lt;Boolean>} Returns true if the database was successfully deleted
+     */
+    delete() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.id}/databases/${this.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
+                if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.databases.cache.delete(this.id);
+                resolve(true)
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
+    }
+}
+
+module.exports = ServerDatabase;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="APIKey.html">APIKey</a></li><li><a href="Client.html">Client</a></li><li><a href="ClientAPIKeyManager.html">ClientAPIKeyManager</a></li><li><a href="ClientServerManager.html">ClientServerManager</a></li><li><a href="ClientUserManager.html">ClientUserManager</a></li><li><a href="Server.html">Server</a></li><li><a href="ServerAllocation.html">ServerAllocation</a></li><li><a href="ServerAllocationManager.html">ServerAllocationManager</a></li><li><a href="ServerBackup.html">ServerBackup</a></li><li><a href="ServerBackupManager.html">ServerBackupManager</a></li><li><a href="ServerDatabase.html">ServerDatabase</a></li><li><a href="ServerDatabaseManager.html">ServerDatabaseManager</a></li><li><a href="ServerFile.html">ServerFile</a></li><li><a href="ServerFileManager.html">ServerFileManager</a></li><li><a href="ServerSchedule.html">ServerSchedule</a></li><li><a href="ServerScheduleManager.html">ServerScheduleManager</a></li><li><a href="ServerScheduleTask.html">ServerScheduleTask</a></li><li><a href="ServerScheduleTaskManager.html">ServerScheduleTaskManager</a></li><li><a href="ServerSubuser.html">ServerSubuser</a></li><li><a href="ServerSubuserManager.html">ServerSubuserManager</a></li><li><a href="ServerVariable.html">ServerVariable</a></li><li><a href="ServerVariableManager.html">ServerVariableManager</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Jul 18 2022 21:22:45 GMT+0200 (Midden-Europese zomertijd)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

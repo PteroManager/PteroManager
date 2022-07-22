@@ -1,11 +1,12 @@
 {
   "name": "pteromanager",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "description": "",
   "private": false,
   "main": "index.js",
   "scripts": {
-    "test": "nodemon tests/index.js"
+    "docs-gen": "jsdoc --recurse D:\\Programming\\PteroManager\\PteroManager\\src\\",
+    "docs": "npm run docs-gen"
   },
   "repository": {
     "type": "git",

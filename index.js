@@ -1,1 +1,1 @@
-module.exports = require('./v1')
+module.exports = require('./v1.js')

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Classes/Client/Server/ServerAllocation.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Classes/Client/Server/ServerAllocation.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Client = require('../../../Client')
+const Server = require('./Server')
+const requests = require('../../../requests');
+const ServerAllocationManager = require('../Managers/ServerAllocationManager');
+
+class ServerAllocation {
+    /**
+     * Create a new ServerAllocation class
+     * @param {Client} client 
+     * @param {object} server 
+     * @param {string} server.identifier The identifier of the server
+     * @param {object} data 
+     */
+    constructor(client, server, data) {
+        this.client = client;
+        this.server = server;
+
+        this.id = data.id;
+        this.ip = data.ip;
+        this.ipAlias = data.ip_alias;
+        this.port = data.port;
+        this.notes = data.notes;
+        this.isDefault = data.is_default;
+    }
+
+    /**
+     * Fetch this allocation
+     * @returns {Promise&lt;ServerAllocation>} The allocation
+     */
+    fetch() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/allocations/${this.id}`, this.client.APIKey, 'GET', {}).then(res => {
+                if(this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.allocations.cache.set(this.id, new ServerAllocation(this.client, this.server, res.attributes))
+                resolve(new ServerAllocation(this.client, this.server, res.attributes));
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            })
+        })
+    }
+
+    /**
+     * Delete this allocation
+     * @returns {Promise&lt;Boolean>} Whether the allocation was deleted
+     */
+    delete() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'DELETE', {}).then(res => {
+                if(this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.allocations.cache.delete(this.id)
+                resolve(true)
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
+    }
+
+    /**
+     * Update this allocation
+     * @param {object} data The data
+     * @param {string} data.note The name of the allocation
+     * @returns {Promise&lt;ServerAllocation>} The updated allocation
+     */
+    setNote(data) {
+        if (!data) throw new Error('No data provided')
+        if (typeof data !== 'object') throw new TypeError('Data must be an object')
+        if (!data.note) throw new Error('No note provided')
+        if (typeof data.note !== 'string') throw new TypeError('Note must be a string')
+
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}`, this.client.APIKey, 'POST', { notes: data.note}).then(res => {
+                let allocation = new ServerAllocation(this.client, { identifier: this.server.identifier }, res.attributes)
+                if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.allocations.cache.set(this.id, allocation)
+                resolve(allocation)
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
+    }
+
+    /**
+     * Set this allocation as the primary allocation
+     * @returns {Promise&lt;ServerAllocation>} The updated allocation
+     */
+    setPrimary() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/network/allocations/${this.id}/primary`, this.client.APIKey, 'POST', { is_default: true }).then(res => {
+                let allocation = new ServerAllocation(this.client, { identifier: this.server.identifier }, res.attributes)
+                if (this.client.options.enableCache) this.client.servers.cache.get(this.server.identifier)?.allocations.cache.set(this.id, allocation)
+                resolve(allocation)
+            }).catch(err => {
+                reject(this.client._throwError(err))
+            })
+        })
+    }
+}
+
+module.exports = ServerAllocation;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="APIKey.html">APIKey</a></li><li><a href="Client.html">Client</a></li><li><a href="ClientAPIKeyManager.html">ClientAPIKeyManager</a></li><li><a href="ClientServerManager.html">ClientServerManager</a></li><li><a href="ClientUserManager.html">ClientUserManager</a></li><li><a href="Server.html">Server</a></li><li><a href="ServerAllocation.html">ServerAllocation</a></li><li><a href="ServerAllocationManager.html">ServerAllocationManager</a></li><li><a href="ServerBackup.html">ServerBackup</a></li><li><a href="ServerBackupManager.html">ServerBackupManager</a></li><li><a href="ServerDatabase.html">ServerDatabase</a></li><li><a href="ServerDatabaseManager.html">ServerDatabaseManager</a></li><li><a href="ServerFile.html">ServerFile</a></li><li><a href="ServerFileManager.html">ServerFileManager</a></li><li><a href="ServerSchedule.html">ServerSchedule</a></li><li><a href="ServerScheduleManager.html">ServerScheduleManager</a></li><li><a href="ServerScheduleTask.html">ServerScheduleTask</a></li><li><a href="ServerScheduleTaskManager.html">ServerScheduleTaskManager</a></li><li><a href="ServerSubuser.html">ServerSubuser</a></li><li><a href="ServerSubuserManager.html">ServerSubuserManager</a></li><li><a href="ServerVariable.html">ServerVariable</a></li><li><a href="ServerVariableManager.html">ServerVariableManager</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Jul 18 2022 21:22:45 GMT+0200 (Midden-Europese zomertijd)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

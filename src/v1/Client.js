@@ -11,7 +11,7 @@ class Client {
      * @param {string} host The url of the Pterodactyl Panel
      * @param {string} APIKey The APIKey of the Client
      * @param {object} options The options
-     * @param {object} [options.enableCache] Whether to enable the cache
+     * @param {Boolean} [options.enableCache] Whether to enable the cache
      */
     constructor(host, APIKey, options) {
         if (!host) {
@@ -34,12 +34,31 @@ class Client {
 
         host += '/api/client'
 
+        /**
+         * @type {String}
+         */
         this.host = host;
+
+        /**
+         * @type {String}
+         */
         this.APIKey = APIKey;
 
+        /**
+         * @type {Object} The options
+         * @property {String} [options.enableCache] Whether to enable the cache
+         */
         this.options = options || {};
 
+        /**
+         * Manage the user's account
+         * @type {ClientUserManager}
+         */
         this.user = new ClientUserManager(this);
+
+        /**
+         * @type {ClientServerManager}
+         */
         this.servers = new ClientServerManager(this);
     }
 

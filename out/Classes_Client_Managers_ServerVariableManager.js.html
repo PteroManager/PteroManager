@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Classes/Client/Managers/ServerVariableManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Classes/Client/Managers/ServerVariableManager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Client = require('../../../Client');
+const { default: Collection } = require('@pteromanager/collection');
+const ServerVariable = require('../Server/ServerVariable');
+
+class ServerVariableManager {
+    /**
+     * Create a new ServerVariableManager
+     * @param {Client} client The PteroManager Client
+     * @param {object} server The server
+     * @param {string} server.identifier The server identifier
+     * @param {Array} data The data
+     * @param {object} metadata The metadata
+     */
+    constructor(client, server, data, metadata) {
+        this.client = client;
+        this.server = server;
+
+        /**
+         * @type {Collection&lt;string, ServerVariable>} The cache
+         */
+        this.cache = new Collection();
+
+        data.forEach(variable => {
+            this.cache.set(variable.attributes.env_variable, new ServerVariable(client, server, variable.attributes));
+        });
+
+        if (metadata) {
+            if (metadata.startup_command) {
+                this.startupCommand = metadata.startup_command;
+            }
+            if (metadata.raw_startup_command) {
+                this.rawStartupCommand = metadata.raw_startup_command;
+            }
+        }
+    }
+
+    /**
+     * Fetch the server variables
+     * @returns {Promise&lt;Collection&lt;string, ServerVariable>>} The server variables
+     */
+    fetchAll() {
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/startup`, this.client.APIKey, 'GET', {}).then(res => {
+                let variables = new Collection();
+                res.forEach(variable => {
+                    if (this.client.options.enableCache) this.cache.set(variable.attributes.env_variable, new ServerVariable(this.client, this.server, variable.attributes.env_variable));
+                    variables.set(variable.attributes.env_variable, new ServerVariable(this.client, this.server, variable.attributes.key));
+                });
+                resolve(variables);
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            });
+        });
+    }
+
+    /**
+     * Update a server variable
+     * @param {object} data The data
+     * @param {string} data.key The variable key
+     * @param {any} [data.value] The variable value
+     * @returns {Promise&lt;ServerVariable>} The server variable
+     */
+    update(data) {
+        if (!data) throw new Error('No data provided');
+        if (typeof data !== 'object') throw new Error('Data must be an object');
+        if (!data.key) throw new Error('No key provided');
+        if (typeof data.key !== 'string') throw new Error('Key must be a string');
+
+        return new Promise((resolve, reject) => {
+            this.client._request(`${this.client.host}/servers/${this.server.identifier}/startup/variable`, this.client.APIKey, 'PUT', data).then(res => {
+                if (this.client.options.enableCache) {
+                    this.cache.set(data.key, new ServerVariable(this.client, this.server, res.attributes));
+                }
+                resolve(new ServerVariable(this.client, this.server, res.attributes));
+            }).catch(err => {
+                reject(this.client._throwError(err));
+            });
+        });
+    }
+}
+
+module.exports = ServerVariableManager;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="APIKey.html">APIKey</a></li><li><a href="Client.html">Client</a></li><li><a href="ClientAPIKeyManager.html">ClientAPIKeyManager</a></li><li><a href="ClientServerManager.html">ClientServerManager</a></li><li><a href="ClientUserManager.html">ClientUserManager</a></li><li><a href="Server.html">Server</a></li><li><a href="ServerAllocation.html">ServerAllocation</a></li><li><a href="ServerAllocationManager.html">ServerAllocationManager</a></li><li><a href="ServerBackup.html">ServerBackup</a></li><li><a href="ServerBackupManager.html">ServerBackupManager</a></li><li><a href="ServerDatabase.html">ServerDatabase</a></li><li><a href="ServerDatabaseManager.html">ServerDatabaseManager</a></li><li><a href="ServerFile.html">ServerFile</a></li><li><a href="ServerFileManager.html">ServerFileManager</a></li><li><a href="ServerSchedule.html">ServerSchedule</a></li><li><a href="ServerScheduleManager.html">ServerScheduleManager</a></li><li><a href="ServerScheduleTask.html">ServerScheduleTask</a></li><li><a href="ServerScheduleTaskManager.html">ServerScheduleTaskManager</a></li><li><a href="ServerSubuser.html">ServerSubuser</a></li><li><a href="ServerSubuserManager.html">ServerSubuserManager</a></li><li><a href="ServerVariable.html">ServerVariable</a></li><li><a href="ServerVariableManager.html">ServerVariableManager</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Jul 18 2022 21:22:45 GMT+0200 (Midden-Europese zomertijd)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
